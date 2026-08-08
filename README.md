@@ -1,16 +1,22 @@
-# React + Vite
+# Landing Page con Panel de Administración
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+Landing page con formulario de contacto conectado a una base de datos real, más un panel de administración protegido con autenticación.
 
-Currently, two official plugins are available:
+## Tecnologías utilizadas
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Oxc](https://oxc.rs)
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/)
+- React
+- Tailwind CSS
+- React Router
+- Fetch API para consumir el backend
 
-## React Compiler
+## Funcionalidades
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+- Formulario de contacto que guarda los mensajes en base de datos
+- Sistema de login con autenticación JWT
+- Panel de administración protegido, donde se visualizan los mensajes recibidos
+- Diseño responsive
 
-## Expanding the ESLint configuration
+## Backend relacionado
 
-If you are developing a production application, we recommend using TypeScript with type-aware lint rules enabled. Check out the [TS template](https://github.com/vitejs/vite/tree/main/packages/create-vite/template-react-ts) for information on how to integrate TypeScript and [`typescript-eslint`](https://typescript-eslint.io) in your project.
+Este proyecto consume la API REST disponible en:
+https://github.com/robledocordoba123-cmyk/landing-panel-backend
