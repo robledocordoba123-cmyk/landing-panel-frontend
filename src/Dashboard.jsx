@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { PawPrint, LogOut, Inbox, CheckCircle2, Mail, Phone, RotateCcw, Clock } from 'lucide-react';
+import { PawPrint, LogOut, Inbox, CheckCircle2, Mail, Phone, RotateCcw, Clock, MessageCircle, Globe } from 'lucide-react';
 import { api } from './api';
 
 const FILTROS = [
@@ -77,7 +77,7 @@ function Dashboard() {
 
       <main className="mx-auto max-w-5xl px-5 py-8">
         <h1 className="text-2xl font-extrabold text-stone-900">Solicitudes de cita</h1>
-        <p className="text-stone-600">Lo que tus clientes envían desde la página.</p>
+        <p className="text-stone-600">Lo que tus clientes envían desde la página y por WhatsApp.</p>
 
         <div className="mt-6 grid gap-4 sm:grid-cols-2">
           <div className="flex items-center gap-4 rounded-2xl bg-white p-5 shadow-sm">
@@ -113,12 +113,19 @@ function Dashboard() {
                   <div>
                     <h2 className="font-bold text-stone-900">{m.nombre}{m.mascota && <span className="font-normal text-stone-500"> · {m.mascota}</span>}</h2>
                     <p className="mt-1 flex flex-wrap gap-x-4 gap-y-1 text-sm text-stone-500">
-                      <span className="inline-flex items-center gap-1"><Mail size={14} /> {m.email}</span>
+                      {!m.email.endsWith("@whatsapp") && <span className="inline-flex items-center gap-1"><Mail size={14} /> {m.email}</span>}
                       {m.telefono && <span className="inline-flex items-center gap-1"><Phone size={14} /> {m.telefono}</span>}
                       <span className="inline-flex items-center gap-1"><Clock size={14} /> {fecha(m.creadoEn)}</span>
                     </p>
                   </div>
-                  {m.servicio && <span className="rounded-full bg-teal-50 px-3 py-1 text-xs font-bold text-teal-700">{m.servicio}</span>}
+                  <div className="flex flex-wrap gap-2">
+                    {m.origen === 'WHATSAPP' ? (
+                      <span className="inline-flex items-center gap-1 rounded-full bg-green-50 px-3 py-1 text-xs font-bold text-green-700"><MessageCircle size={12} /> WhatsApp</span>
+                    ) : (
+                      <span className="inline-flex items-center gap-1 rounded-full bg-stone-100 px-3 py-1 text-xs font-bold text-stone-600"><Globe size={12} /> Página web</span>
+                    )}
+                    {m.servicio && <span className="rounded-full bg-teal-50 px-3 py-1 text-xs font-bold text-teal-700">{m.servicio}</span>}
+                  </div>
                 </div>
                 <p className="mt-3 text-stone-700">{m.mensaje}</p>
                 <div className="mt-4">

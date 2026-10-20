@@ -2,11 +2,12 @@ import { useState } from 'react';
 import { BrowserRouter, Routes, Route, Link } from 'react-router-dom';
 import {
   PawPrint, Stethoscope, Syringe, Scissors, Siren, Clock, MapPin, Phone,
-  CalendarCheck, CheckCircle2, Heart, ShieldCheck, ChevronDown, Send, Lock,
+  CalendarCheck, CheckCircle2, Heart, ShieldCheck, ChevronDown, Send, Lock, MessageCircle,
 } from 'lucide-react';
 import { api } from './api';
 import Login from './Login';
 import Dashboard from './Dashboard';
+import Asistente from './Asistente';
 
 const SERVICIOS = [
   { icono: Stethoscope, titulo: 'Consulta general', texto: 'Revisión completa, diagnóstico y tratamiento para perros, gatos y otras mascotas.' },
@@ -235,6 +236,11 @@ function LandingPage() {
         </div>
       </section>
 
+      {/* Botón flotante de WhatsApp: abre el asistente */}
+      <Link to="/whatsapp" className="fixed bottom-5 right-5 z-30 inline-flex items-center gap-2 rounded-full bg-[#25d366] px-5 py-3 font-bold text-white shadow-xl shadow-green-700/30 transition hover:scale-105">
+        <MessageCircle size={22} /> <span className="hidden sm:inline">Escríbenos por WhatsApp</span>
+      </Link>
+
       <footer className="bg-stone-900 py-10 text-stone-400">
         <div className="mx-auto flex max-w-6xl flex-col items-center justify-between gap-4 px-5 text-sm md:flex-row">
           <p className="flex items-center gap-2 font-bold text-white"><PawPrint size={18} /> Huellitas Veterinaria</p>
@@ -253,6 +259,7 @@ function App() {
         <Route path="/" element={<LandingPage />} />
         <Route path="/login" element={<Login />} />
         <Route path="/admin" element={<Dashboard />} />
+        <Route path="/whatsapp" element={<Asistente />} />
       </Routes>
     </BrowserRouter>
   );

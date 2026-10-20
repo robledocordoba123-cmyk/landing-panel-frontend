@@ -8,6 +8,7 @@ Página web para un negocio local (una veterinaria **ficticia**, creada como pro
 - **Formulario de cita** con validación (nombre, correo, teléfono, mascota, servicio y mensaje) y mensajes claros de error o de éxito.
 - **Panel del negocio** con login: contador de solicitudes por atender y atendidas, filtros, y botón para marcar como atendida o deshacer.
 - La sesión vence sola y, si el token ya no sirve, el panel devuelve al login.
+- **Asistente de WhatsApp** (`/whatsapp`): simulador con apariencia de WhatsApp que habla con el mismo bot que atiende el WhatsApp real. Agenda citas, responde servicios y horarios, y pasa a una persona. Las citas que agenda llegan al panel con la etiqueta "WhatsApp".
 
 ## Tecnologías
 
