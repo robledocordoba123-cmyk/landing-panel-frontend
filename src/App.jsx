@@ -185,6 +185,12 @@ function LandingPage() {
           <div id="cita" className="scroll-mt-24 rounded-3xl bg-white p-6 shadow-xl shadow-stone-200 md:p-8 lg:col-span-3">
             <h2 className="text-2xl font-extrabold text-stone-900">Pide tu cita</h2>
             <p className="mt-1 text-stone-600">Déjanos tus datos y te confirmamos la hora el mismo día.</p>
+            {/* En la demo pública cualquiera puede ver el panel: se pide no usar datos reales. */}
+            {import.meta.env.VITE_MODO_DEMO === 'true' && (
+              <p className="mt-3 rounded-xl bg-amber-50 px-4 py-2 text-sm text-amber-800">
+                Esta es una demo pública: lo que envíes se ve en el panel de demostración. No escribas tu correo ni tu teléfono reales.
+              </p>
+            )}
 
             {estado === 'enviado' ? (
               <div className="mt-6 rounded-2xl bg-teal-50 p-6 text-center" role="status">

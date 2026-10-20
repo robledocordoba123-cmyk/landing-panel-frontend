@@ -2,6 +2,8 @@
 
 Página web para un negocio local (una veterinaria **ficticia**, creada como proyecto de portafolio) donde los clientes piden cita desde el celular, y un **panel privado** donde el negocio ve las solicitudes y las marca como atendidas.
 
+**Demo en vivo:** [huellitas-veterinaria.vercel.app](https://huellitas-veterinaria.vercel.app). Para ver el panel, abre "Panel del negocio" al final de la página y usa el botón "Entrar con la cuenta de demostración". El simulador de WhatsApp está en [/whatsapp](https://huellitas-veterinaria.vercel.app/whatsapp).
+
 ## Qué incluye
 
 - **Landing page adaptable al celular:** servicios, horarios, preguntas frecuentes y botón "Pedir cita" siempre a la vista.
@@ -26,7 +28,7 @@ Variables (ver `.env.example`):
 | Variable | Para qué |
 |---|---|
 | `VITE_API_URL` | Dirección de la API al publicar (en local no hace falta) |
-| `VITE_MODO_DEMO` | `true` muestra en el login el botón de la cuenta de demostración |
+| `VITE_MODO_DEMO` | `true` muestra en el login el botón de la cuenta de demostración y, en el formulario, el aviso de no escribir datos reales |
 
 ## API
 
