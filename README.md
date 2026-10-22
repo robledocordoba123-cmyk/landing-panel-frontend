@@ -36,3 +36,7 @@ Backend en [landing-panel-backend](https://github.com/robledocordoba123-cmyk/lan
 
 ---
 Diseño y desarrollo: Manuela Córdoba Robledo.
+
+## Uso de inteligencia artificial
+
+Este proyecto se desarrolló con apoyo de herramientas de IA (Claude Code). El diseño, las decisiones, la revisión del código y las pruebas son míos, y puedo explicar cada parte.
