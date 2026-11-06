@@ -2,7 +2,7 @@
 
 Página web para un negocio local (una veterinaria **ficticia**, creada como proyecto de portafolio) donde los clientes reservan su cita eligiendo día y hora, y un **panel privado** donde el negocio maneja su agenda.
 
-**Demo en vivo:** [huellitas-veterinaria.vercel.app](https://huellitas-veterinaria.vercel.app). Para ver el panel, abre "Panel del negocio" al final de la página y usa el botón "Entrar con la cuenta de demostración". El simulador de WhatsApp está en [/whatsapp](https://huellitas-veterinaria.vercel.app/whatsapp).
+**Demo en vivo:** [huellitas-veterinaria.vercel.app](https://huellitas-veterinaria.vercel.app). Para ver el panel, abre "Panel del negocio" al final de la página y elige un rol: administración, veterinario o recepción. El simulador de WhatsApp está en [/whatsapp](https://huellitas-veterinaria.vercel.app/whatsapp).
 
 ## Identidad visual
 
@@ -19,7 +19,9 @@ Huellitas tiene diseño propio, no una plantilla:
 - **Landing page adaptable al celular:** servicios, horarios, preguntas frecuentes y botón "Pedir cita" siempre a la vista.
 - **Reserva en tres pasos:** servicio, día y hora (solo horarios realmente libres) y datos de contacto.
 - **Mi cita:** el cliente cancela o cambia su cita con un enlace, sin crear una cuenta.
-- **Panel del negocio:** agenda por día, clientes con buscador, ficha de cada mascota con historia clínica y carné de vacunas para imprimir, aviso de vacunas por renovar, registro de correos y bandeja de mensajes.
+- **Panel del negocio con roles:** agenda por día, clientes con buscador, ficha de cada mascota con historia clínica y carné de vacunas para imprimir, aviso de vacunas por renovar, registro de correos, mensajes, equipo y bitácora.
+- **Datos personales:** autorización según la Ley 1581 y política de datos.
+- **Seguridad:** la sesión va en una cookie que JavaScript no puede leer y `vercel.json` define CSP y demás encabezados. Vercel redirige `/api` a la API; en desarrollo lo hace Vite.
 - La sesión vence sola y, si el token ya no sirve, el panel devuelve al login.
 - **Asistente de WhatsApp** (`/whatsapp`): simulador con apariencia de WhatsApp que habla con el mismo bot que atiende el WhatsApp real. Agenda citas, responde servicios y horarios, y pasa a una persona. Las citas que agenda llegan al panel con la etiqueta "WhatsApp".
 

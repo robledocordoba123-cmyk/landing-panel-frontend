@@ -7,7 +7,12 @@ import { Arco } from './Mascota';
 
 // En la demo pública se muestra la cuenta de prueba (VITE_MODO_DEMO=true).
 const MODO_DEMO = import.meta.env.VITE_MODO_DEMO === 'true';
-const DEMO = { email: 'admin@huellitas.demo', password: 'Huellitas2026!' };
+const CLAVE_DEMO = 'Huellitas2026!';
+const CUENTAS_DEMO = [
+  { texto: 'Administración', email: 'admin@huellitas.demo' },
+  { texto: 'Veterinario', email: 'vet@huellitas.demo' },
+  { texto: 'Recepción', email: 'recepcion@huellitas.demo' },
+];
 
 // El plan gratuito del hosting apaga la API tras un rato sin uso y tarda cerca
 // de un minuto en encender: si la respuesta se demora, se explica por qué.
@@ -34,8 +39,7 @@ function Login() {
     setError('');
     setCargando(true);
     try {
-      const { token } = await api('/api/login', { metodo: 'POST', datos: credenciales });
-      localStorage.setItem('token', token);
+      await api('/api/login', { metodo: 'POST', datos: credenciales });
       navigate('/admin');
     } catch (err) {
       setError(err.message);
@@ -86,10 +90,17 @@ function Login() {
               <LogIn size={18} /> {cargando ? 'Entrando…' : 'Iniciar sesión'}
             </button>
             {MODO_DEMO && (
-              <button type="button" onClick={() => entrar(DEMO)} disabled={cargando}
-                className="w-full rounded-xl bg-mantequilla py-3 text-sm font-bold text-tinta-900 transition hover:brightness-95 disabled:opacity-60">
-                Probar con la cuenta de demostración
-              </button>
+              <div className="pt-2">
+                <p className="text-sm font-semibold text-tinta-700">Prueba la demo como:</p>
+                <div className="mt-2 grid grid-cols-3 gap-2">
+                  {CUENTAS_DEMO.map((c) => (
+                    <button key={c.email} type="button" onClick={() => entrar({ email: c.email, password: CLAVE_DEMO })} disabled={cargando}
+                      className="rounded-xl bg-mantequilla px-1 py-2.5 text-xs font-bold text-tinta-900 transition hover:brightness-95 disabled:opacity-60">
+                      {c.texto}
+                    </button>
+                  ))}
+                </div>
+              </div>
             )}
           </form>
         </div>

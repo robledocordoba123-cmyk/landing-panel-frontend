@@ -1,20 +1,23 @@
 import { useCallback, useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { LogOut, Inbox, CheckCircle2, Mail, Phone, RotateCcw, Clock, MessageCircle, Globe, CalendarDays, Users, Send } from 'lucide-react';
+import { LogOut, Inbox, CheckCircle2, Mail, Phone, RotateCcw, Clock, MessageCircle, Globe, CalendarDays, Users, Send, ShieldCheck } from 'lucide-react';
 import { api } from './api';
 import Agenda from './Agenda';
 import { Marca } from './Marca';
 import { Arco } from './Mascota';
 import Clientes from './Clientes';
 import Correos from './Correos';
+import Equipo from './Equipo';
 import FichaMascota from './FichaMascota';
 
 const SECCIONES = [
-  { valor: 'agenda', texto: 'Agenda', icono: CalendarDays },
-  { valor: 'clientes', texto: 'Clientes', icono: Users },
-  { valor: 'mensajes', texto: 'Mensajes', icono: Inbox },
-  { valor: 'correos', texto: 'Correos', icono: Send },
+  { valor: 'agenda', texto: 'Agenda', icono: CalendarDays, roles: ['ADMIN', 'VETERINARIO', 'RECEPCION'] },
+  { valor: 'clientes', texto: 'Clientes', icono: Users, roles: ['ADMIN', 'VETERINARIO', 'RECEPCION'] },
+  { valor: 'mensajes', texto: 'Mensajes', icono: Inbox, roles: ['ADMIN', 'VETERINARIO', 'RECEPCION'] },
+  { valor: 'correos', texto: 'Correos', icono: Send, roles: ['ADMIN', 'RECEPCION'] },
+  { valor: 'equipo', texto: 'Equipo', icono: ShieldCheck, roles: ['ADMIN'] },
 ];
+const ROLES = { ADMIN: 'Administración', VETERINARIO: 'Veterinario', RECEPCION: 'Recepción' };
 
 const FILTROS = [
   { valor: '', texto: 'Todas' },
@@ -33,23 +36,32 @@ function Dashboard() {
   const [filtro, setFiltro] = useState('');
   const [error, setError] = useState('');
   const navigate = useNavigate();
-  const token = localStorage.getItem('token');
+  const [usuario, setUsuario] = useState(null);
 
-  const salir = useCallback(() => {
-    localStorage.removeItem('token');
-    navigate('/login');
-  }, [navigate]);
+  const irALogin = useCallback(() => navigate('/login'), [navigate]);
+
+  const salir = useCallback(async () => {
+    await api('/api/logout', { metodo: 'POST' }).catch(() => {});
+    irALogin();
+  }, [irALogin]);
+
+  useEffect(() => {
+    let vigente = true;
+    api('/api/sesion')
+      .then((u) => vigente && setUsuario(u))
+      .catch(() => vigente && irALogin());
+    return () => {
+      vigente = false;
+    };
+  }, [irALogin]);
 
   // Cambia cada vez que se marca una solicitud, para volver a cargar la lista.
   const [version, setVersion] = useState(0);
 
   useEffect(() => {
-    if (!token) {
-      navigate('/login');
-      return;
-    }
+    if (!usuario) return undefined;
     let vigente = true;
-    api(`/api/mensajes${filtro ? `?estado=${filtro}` : ''}`, { token })
+    api(`/api/mensajes${filtro ? `?estado=${filtro}` : ''}`)
       .then((d) => {
         if (!vigente) return;
         setDatos(d);
@@ -57,17 +69,17 @@ function Dashboard() {
       })
       .catch((err) => {
         if (!vigente) return;
-        if (err.estado === 401) salir();
+        if (err.estado === 401) irALogin();
         else setError(err.message);
       });
     return () => {
       vigente = false;
     };
-  }, [token, filtro, version, navigate, salir]);
+  }, [usuario, filtro, version, irALogin]);
 
   const cambiarEstado = async (id, estado) => {
     try {
-      await api(`/api/mensajes/${id}`, { metodo: 'PATCH', datos: { estado }, token });
+      await api(`/api/mensajes/${id}`, { metodo: 'PATCH', datos: { estado } });
       setVersion((v) => v + 1);
     } catch (err) {
       setError(err.message);
@@ -81,6 +93,8 @@ function Dashboard() {
     setSeccion(nueva);
   };
 
+  if (!usuario) return <p className="grid min-h-screen place-items-center bg-crema-100 text-tinta-500">Cargando…</p>;
+
   return (
     <div className="min-h-screen bg-crema-100 lg:grid lg:grid-cols-[15rem_1fr] print:block print:bg-white">
       <aside className="relative overflow-hidden bg-pino-700 text-crema-50 lg:sticky lg:top-0 lg:flex lg:h-screen lg:flex-col print:hidden">
@@ -89,7 +103,7 @@ function Dashboard() {
           <button onClick={salir} className="inline-flex items-center gap-1 rounded-lg p-2 text-sm font-semibold text-pino-200 hover:text-white lg:hidden" aria-label="Cerrar sesión"><LogOut size={18} /></button>
         </div>
         <nav className="flex gap-1 overflow-x-auto px-3 pb-3 [scrollbar-width:none] lg:flex-col lg:px-3" aria-label="Secciones del panel">
-          {SECCIONES.map(({ valor, texto, icono: Icono }) => (
+          {SECCIONES.filter((s) => s.roles.includes(usuario.rol)).map(({ valor, texto, icono: Icono }) => (
             <button key={valor} type="button" onClick={() => irA(valor)} aria-current={seccion === valor ? 'page' : undefined}
               className={`inline-flex shrink-0 items-center gap-3 rounded-xl px-4 py-2.5 text-sm font-bold transition ${seccion === valor ? 'bg-crema-50 text-pino-700' : 'text-pino-200 hover:bg-pino-600 hover:text-white'}`}>
               <Icono size={18} /> {texto}
@@ -98,6 +112,7 @@ function Dashboard() {
           ))}
         </nav>
         <div className="mt-auto hidden lg:block">
+          <p className="px-7 text-sm font-bold text-crema-50">{usuario.nombre}<span className="block font-normal text-pino-200">{ROLES[usuario.rol]}</span></p>
           <button onClick={salir} className="mx-3 mb-4 inline-flex items-center gap-2 rounded-lg px-4 py-2 text-sm font-semibold text-pino-200 hover:text-white"><LogOut size={16} /> Cerrar sesión</button>
           <div className="asomarse flex items-end gap-2 px-5" aria-hidden="true">
             <Arco especie="Gato" nombre="Misha" fondo="bg-lila" className="h-24 w-20" />
@@ -107,10 +122,11 @@ function Dashboard() {
       </aside>
 
       <main className="mx-auto w-full max-w-4xl px-5 py-8 lg:px-10 lg:py-10 print:max-w-none print:p-0">
-        {mascotaAbierta && <FichaMascota token={token} mascotaId={mascotaAbierta} alVolver={() => setMascotaAbierta(null)} alCaducarSesion={salir} />}
-        {!mascotaAbierta && seccion === 'agenda' && <Agenda token={token} alAbrirMascota={setMascotaAbierta} alCaducarSesion={salir} />}
-        {!mascotaAbierta && seccion === 'clientes' && <Clientes token={token} alAbrirMascota={setMascotaAbierta} alCaducarSesion={salir} />}
-        {!mascotaAbierta && seccion === 'correos' && <Correos token={token} alCaducarSesion={salir} />}
+        {mascotaAbierta && <FichaMascota usuario={usuario} mascotaId={mascotaAbierta} alVolver={() => setMascotaAbierta(null)} alCaducarSesion={irALogin} />}
+        {!mascotaAbierta && seccion === 'agenda' && <Agenda usuario={usuario} alAbrirMascota={setMascotaAbierta} alCaducarSesion={irALogin} />}
+        {!mascotaAbierta && seccion === 'clientes' && <Clientes usuario={usuario} alAbrirMascota={setMascotaAbierta} alCaducarSesion={irALogin} />}
+        {!mascotaAbierta && seccion === 'correos' && <Correos alCaducarSesion={irALogin} />}
+        {!mascotaAbierta && seccion === 'equipo' && <Equipo usuario={usuario} alCaducarSesion={irALogin} />}
         {!mascotaAbierta && seccion === 'mensajes' && (
         <>
         <h1 className="text-4xl font-extrabold text-pino-700">Mensajes</h1>

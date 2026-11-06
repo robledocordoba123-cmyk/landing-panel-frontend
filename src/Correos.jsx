@@ -11,7 +11,7 @@ const ESTADOS = {
 const fechaHora = (f) => new Date(f).toLocaleString('es-CO', { timeZone: 'America/Bogota', dateStyle: 'medium', timeStyle: 'short' });
 
 // Registro de los correos a clientes y botón para los recordatorios de mañana.
-function Correos({ token, alCaducarSesion }) {
+function Correos({ alCaducarSesion }) {
   const [datos, setDatos] = useState(null);
   const [error, setError] = useState('');
   const [resultado, setResultado] = useState('');
@@ -20,7 +20,7 @@ function Correos({ token, alCaducarSesion }) {
 
   useEffect(() => {
     let vigente = true;
-    api('/api/notificaciones', { token })
+    api('/api/notificaciones')
       .then((d) => vigente && setDatos(d))
       .catch((err) => {
         if (!vigente) return;
@@ -30,14 +30,14 @@ function Correos({ token, alCaducarSesion }) {
     return () => {
       vigente = false;
     };
-  }, [token, version, alCaducarSesion]);
+  }, [version, alCaducarSesion]);
 
   const enviarRecordatorios = async () => {
     setEnviando(true);
     setError('');
     setResultado('');
     try {
-      const r = await api('/api/recordatorios', { metodo: 'POST', token });
+      const r = await api('/api/recordatorios', { metodo: 'POST' });
       setResultado(r.revisadas ? `Listo: ${r.revisadas - r.fallidas} de ${r.revisadas} recordatorios procesados.` : 'No hay recordatorios pendientes para mañana.');
       setVersion((v) => v + 1);
     } catch (err) {

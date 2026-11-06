@@ -8,17 +8,19 @@ const fechaCorta = (f) => new Date(f).toLocaleDateString('es-CO', { timeZone: 'U
 const MS_ESPERA_BUSQUEDA = 300;
 
 // Lista de clientes con buscador, y aviso de vacunas vencidas o por vencer.
-function Clientes({ token, alAbrirMascota, alCaducarSesion }) {
+function Clientes({ usuario, alAbrirMascota, alCaducarSesion }) {
   const [busqueda, setBusqueda] = useState('');
   const [clientes, setClientes] = useState(null);
   const [vacunas, setVacunas] = useState([]);
   const [error, setError] = useState('');
+  const [porSuprimir, setPorSuprimir] = useState(null);
+  const [version, setVersion] = useState(0);
 
   useEffect(() => {
     let vigente = true;
     // Espera a que dejen de escribir, para no consultar por cada letra.
     const espera = setTimeout(() => {
-      api(`/api/clientes?q=${encodeURIComponent(busqueda)}`, { token })
+      api(`/api/clientes?q=${encodeURIComponent(busqueda)}`)
         .then((d) => {
           if (!vigente) return;
           setClientes(d);
@@ -34,17 +36,28 @@ function Clientes({ token, alAbrirMascota, alCaducarSesion }) {
       vigente = false;
       clearTimeout(espera);
     };
-  }, [busqueda, token, alCaducarSesion]);
+  }, [busqueda, version, alCaducarSesion]);
 
   useEffect(() => {
     let vigente = true;
-    api('/api/vacunas/por-vencer', { token })
+    api('/api/vacunas/por-vencer')
       .then((d) => vigente && setVacunas(d))
       .catch(() => {}); // Es un aviso: si falla, la lista de clientes sigue sirviendo.
     return () => {
       vigente = false;
     };
-  }, [token]);
+  }, []);
+
+  const suprimir = async (id) => {
+    setError('');
+    try {
+      await api(`/api/clientes/${id}/suprimir`, { metodo: 'POST' });
+      setVersion((v) => v + 1);
+    } catch (err) {
+      setError(err.message);
+    }
+    setPorSuprimir(null);
+  };
 
   return (
     <section>
@@ -95,6 +108,15 @@ function Clientes({ token, alAbrirMascota, alCaducarSesion }) {
                 </button>
               ))}
             </div>
+            {usuario.rol === 'ADMIN' && !c.anonimizadoEn && (porSuprimir === c.id ? (
+              <p className="mt-3 flex flex-wrap items-center gap-2 text-sm text-tinta-700">
+                ¿Borrar sus datos personales y cancelar sus citas? No se puede deshacer.
+                <button type="button" onClick={() => suprimir(c.id)} className="rounded-lg bg-red-700 px-3 py-1 font-bold text-white">Sí, suprimir</button>
+                <button type="button" onClick={() => setPorSuprimir(null)} className="rounded-lg bg-crema-100 px-3 py-1 font-bold">No</button>
+              </p>
+            ) : (
+              <button type="button" onClick={() => setPorSuprimir(c.id)} className="mt-3 text-sm font-semibold text-tinta-500 underline hover:text-red-700">Suprimir datos personales</button>
+            ))}
           </article>
         ))}
       </div>

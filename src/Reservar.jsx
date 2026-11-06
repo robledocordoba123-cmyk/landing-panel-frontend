@@ -5,7 +5,7 @@ import { api } from './api';
 import { Arco } from './Mascota';
 import { DIAS_MAXIMOS, fechaHoy, fechaLarga, hora, sumarDias, useHorarios } from './horarios';
 
-const DATOS_VACIOS = { nombre: '', email: '', telefono: '', mascota: '', especie: 'Perro', notas: '' };
+const DATOS_VACIOS = { nombre: '', email: '', telefono: '', mascota: '', especie: 'Perro', notas: '', autorizaDatos: false };
 const ESPECIES = ['Perro', 'Gato', 'Ave', 'Conejo', 'Otro'];
 const campo = 'mt-1 w-full rounded-xl border border-tinta-300 bg-white px-4 py-3 text-tinta-800 outline-none transition focus:border-pino-500 focus:ring-4 focus:ring-pino-100';
 const peso = (n) => `$${n.toLocaleString('es-CO')}`;
@@ -168,6 +168,10 @@ function Reservar() {
           </label>
           <label className="text-sm font-semibold text-tinta-700 sm:col-span-2">¿Algo que debamos saber? <span className="font-normal text-tinta-400">(opcional)</span>
             <textarea name="notas" value={datos.notas} onChange={cambiar} maxLength={500} rows={3} className={campo} />
+          </label>
+          <label className="flex items-start gap-2 text-sm text-tinta-700 sm:col-span-2">
+            <input type="checkbox" checked={datos.autorizaDatos} onChange={(e) => setDatos({ ...datos, autorizaDatos: e.target.checked })} required className="mt-0.5 h-4 w-4 accent-pino-600" />
+            <span>Autorizo el tratamiento de mis datos según la <Link to="/privacidad" className="font-semibold underline">política de datos</Link>.</span>
           </label>
           {error && <p className="text-sm font-medium text-red-600 sm:col-span-2" role="alert">{error}</p>}
           <button type="submit" disabled={enviando}
