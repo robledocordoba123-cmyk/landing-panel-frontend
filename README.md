@@ -4,6 +4,16 @@ Página web para un negocio local (una veterinaria **ficticia**, creada como pro
 
 **Demo en vivo:** [huellitas-veterinaria.vercel.app](https://huellitas-veterinaria.vercel.app). Para ver el panel, abre "Panel del negocio" al final de la página y usa el botón "Entrar con la cuenta de demostración". El simulador de WhatsApp está en [/whatsapp](https://huellitas-veterinaria.vercel.app/whatsapp).
 
+## Identidad visual
+
+Huellitas tiene diseño propio, no una plantilla:
+
+- **Mascotas ilustradas en SVG** (`src/Mascota.jsx`): perro, gato, conejo, ave y otras, dibujadas para este proyecto. El tono sale del nombre, así cada paciente se reconoce en la agenda. Pesan casi nada y no dependen de fotos de banco.
+- **El arco** es el sello de la marca: las mascotas se asoman en arcos de colores, y el logo es una huella cuya almohadilla es un arco.
+- **Tipografía:** Bricolage Grotesque en títulos y Figtree en textos, servidas desde el propio sitio.
+- **Colores** definidos como variables en `src/index.css`: pino, crema, mandarina, mantequilla, lila y menta.
+- La animación de las mascotas respeta a quien pide menos movimiento en su sistema.
+
 ## Qué incluye
 
 - **Landing page adaptable al celular:** servicios, horarios, preguntas frecuentes y botón "Pedir cita" siempre a la vista.

@@ -1,1 +1,78 @@
 @import "tailwindcss";
+@import "@fontsource-variable/bricolage-grotesque";
+@import "@fontsource-variable/figtree";
+
+/* Identidad de Huellitas. Todos los colores salen de aquí. */
+@theme {
+  --font-display: "Bricolage Grotesque Variable", ui-sans-serif, system-ui, sans-serif;
+  --font-sans: "Figtree Variable", ui-sans-serif, system-ui, sans-serif;
+
+  --color-pino-900: #0c221d;
+  --color-pino-800: #0f2a25;
+  --color-pino-700: #14342d;
+  --color-pino-600: #1d4a40;
+  --color-pino-500: #2f7a63;
+  --color-pino-200: #bfe3d2;
+  --color-pino-100: #ddf0e6;
+  --color-pino-50: #eef7f1;
+
+  --color-crema-50: #fffbf3;
+  --color-crema-100: #fbf3e4;
+  --color-crema-200: #f3e7d0;
+
+  --color-tinta-900: #1b2a26;
+  --color-tinta-800: #2a3934;
+  --color-tinta-700: #37463f;
+  --color-tinta-600: #4d5b54;
+  --color-tinta-500: #5f6c65;
+  --color-tinta-400: #8c968f;
+  --color-tinta-300: #cdccbd;
+  --color-tinta-200: #e6e1d2;
+  --color-tinta-100: #f3ecdd;
+  --color-tinta-50: #fbf6ea;
+
+  --color-mandarina-700: #b8430f;
+  --color-mandarina-500: #f56a2b;
+  --color-mandarina-400: #ff8a50;
+  --color-mandarina-100: #ffe3d3;
+
+  --color-mantequilla: #ffcb57;
+  --color-lila: #c8b6ff;
+  --color-menta: #9be2c2;
+  --color-cielo: #a9d8f5;
+  --color-durazno: #ffc2a1;
+}
+
+@layer base {
+  body {
+    background-color: var(--color-crema-100);
+    color: var(--color-tinta-900);
+    -webkit-font-smoothing: antialiased;
+  }
+
+  h1, h2, h3 {
+    font-family: var(--font-display);
+    letter-spacing: -0.02em;
+  }
+
+  :focus-visible {
+    outline: 3px solid var(--color-mandarina-500);
+    outline-offset: 2px;
+  }
+}
+
+/* Las mascotas se asoman una vez al cargar. Quien pide menos movimiento no lo ve. */
+@keyframes asomarse {
+  from { transform: translateY(16%); }
+  to { transform: translateY(0); }
+}
+
+.asomarse svg {
+  animation: asomarse 0.6s cubic-bezier(0.2, 0.8, 0.2, 1) both;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .asomarse svg {
+    animation: none;
+  }
+}
