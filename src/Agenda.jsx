@@ -1,14 +1,15 @@
 import { useEffect, useState } from 'react';
-import { CalendarDays, ChevronLeft, ChevronRight, Globe, Mail, MessageCircle, PawPrint, Phone } from 'lucide-react';
+import { CalendarDays, ChevronLeft, ChevronRight, Globe, Mail, MessageCircle, Phone } from 'lucide-react';
 import { api } from './api';
 import AtencionForm from './AtencionForm';
+import { Arco } from './Mascota';
 
 const ESTADOS = {
-  PENDIENTE: { texto: 'Pendiente', clase: 'bg-amber-100 text-amber-800' },
-  CONFIRMADA: { texto: 'Confirmada', clase: 'bg-teal-100 text-teal-800' },
+  PENDIENTE: { texto: 'Pendiente', clase: 'bg-mantequilla text-tinta-900' },
+  CONFIRMADA: { texto: 'Confirmada', clase: 'bg-menta text-tinta-900' },
   ATENDIDA: { texto: 'Atendida', clase: 'bg-green-100 text-green-800' },
   NO_ASISTIO: { texto: 'No asistió', clase: 'bg-red-100 text-red-800' },
-  CANCELADA: { texto: 'Cancelada', clase: 'bg-stone-200 text-stone-600' },
+  CANCELADA: { texto: 'Cancelada', clase: 'bg-tinta-200 text-tinta-600' },
 };
 
 // Botones según el estado. "yaEmpezo" evita ofrecer lo que la API rechazaría.
@@ -74,54 +75,59 @@ function Agenda({ token, alAbrirMascota, alCaducarSesion }) {
     <section>
       <div className="flex flex-wrap items-center justify-between gap-3">
         <div>
-          <h1 className="text-2xl font-extrabold text-stone-900">Agenda</h1>
-          <p className="text-stone-600 first-letter:uppercase">{fechaLarga(fecha)}{citas && ` · ${activas} ${activas === 1 ? 'cita' : 'citas'}`}</p>
+          <h1 className="text-4xl font-extrabold text-pino-700">Agenda</h1>
+          <p className="text-tinta-600 first-letter:uppercase">{fechaLarga(fecha)}{citas && ` · ${activas} ${activas === 1 ? 'cita' : 'citas'}`}</p>
         </div>
         <div className="flex items-center gap-2">
-          <button type="button" onClick={() => setFecha(sumarDias(fecha, -1))} aria-label="Día anterior" className="grid h-10 w-10 place-items-center rounded-xl bg-white text-stone-600 hover:bg-stone-100"><ChevronLeft size={18} /></button>
-          <button type="button" onClick={() => setFecha(fechaHoy())} className="rounded-xl bg-white px-4 py-2 text-sm font-semibold text-stone-600 hover:bg-stone-100">Hoy</button>
-          <input type="date" value={fecha} onChange={(e) => e.target.value && setFecha(e.target.value)} aria-label="Elegir día" className="rounded-xl border border-stone-200 bg-white px-3 py-2 text-sm text-stone-700" />
-          <button type="button" onClick={() => setFecha(sumarDias(fecha, 1))} aria-label="Día siguiente" className="grid h-10 w-10 place-items-center rounded-xl bg-white text-stone-600 hover:bg-stone-100"><ChevronRight size={18} /></button>
+          <button type="button" onClick={() => setFecha(sumarDias(fecha, -1))} aria-label="Día anterior" className="grid h-10 w-10 place-items-center rounded-full bg-white text-tinta-600 hover:bg-crema-200"><ChevronLeft size={18} /></button>
+          <button type="button" onClick={() => setFecha(fechaHoy())} className="rounded-full bg-white px-4 py-2 text-sm font-semibold text-tinta-600 hover:bg-crema-200">Hoy</button>
+          <input type="date" value={fecha} onChange={(e) => e.target.value && setFecha(e.target.value)} aria-label="Elegir día" className="rounded-xl border border-tinta-200 bg-white px-3 py-2 text-sm text-tinta-700" />
+          <button type="button" onClick={() => setFecha(sumarDias(fecha, 1))} aria-label="Día siguiente" className="grid h-10 w-10 place-items-center rounded-full bg-white text-tinta-600 hover:bg-crema-200"><ChevronRight size={18} /></button>
         </div>
       </div>
 
       {error && <p className="mt-4 text-red-600" role="alert">{error}</p>}
 
       <div className="mt-5 space-y-3">
-        {!citas && !error && <p className="py-10 text-center text-stone-400">Cargando…</p>}
+        {!citas && !error && <p className="py-10 text-center text-tinta-400">Cargando…</p>}
         {citas?.length === 0 && (
-          <p className="flex flex-col items-center gap-2 rounded-2xl border border-dashed border-stone-300 py-10 text-center text-stone-500">
+          <p className="flex flex-col items-center gap-2 rounded-2xl border border-dashed border-tinta-300 py-10 text-center text-tinta-500">
             <CalendarDays size={24} /> No hay citas este día.
           </p>
         )}
         {citas?.map((c) => {
           const estado = ESTADOS[c.estado];
           return (
-            <article key={c.id} className={`grid gap-3 rounded-2xl bg-white p-5 shadow-sm sm:grid-cols-[6rem_1fr] ${c.estado === 'CANCELADA' ? 'opacity-60' : ''}`}>
-              <p className="font-extrabold text-teal-700">{hora(c.inicio)}<span className="block text-xs font-medium text-stone-400">{c.servicio.duracionMin} min</span></p>
+            <article key={c.id} className={`grid grid-cols-[4.5rem_1fr] gap-x-4 gap-y-2 rounded-3xl bg-white p-4 sm:grid-cols-[5.5rem_1fr] sm:p-5 ${c.estado === 'CANCELADA' ? 'opacity-60' : ''}`}>
+              <button type="button" onClick={() => alAbrirMascota(c.mascota.id)} aria-label={`Abrir la ficha de ${c.mascota.nombre}`} className="self-start">
+                <Arco especie={c.mascota.especie} nombre={c.mascota.nombre} className="h-20 w-full sm:h-24" />
+              </button>
               <div>
                 <div className="flex flex-wrap items-start justify-between gap-2">
-                  <h2 className="font-bold text-stone-900">
-                    <button type="button" onClick={() => alAbrirMascota(c.mascota.id)} className="inline-flex items-center gap-1 hover:text-teal-700 hover:underline"><PawPrint size={14} /> {c.mascota.nombre}</button>
-                    {' '}<span className="font-normal text-stone-500">· {c.mascota.especie} · {c.servicio.nombre}</span>
-                  </h2>
+                  <div>
+                    <p className="font-display text-sm font-bold text-mandarina-700">{hora(c.inicio)} · {c.servicio.duracionMin} min</p>
+                    <h2 className="text-xl font-bold text-tinta-900">
+                      <button type="button" onClick={() => alAbrirMascota(c.mascota.id)} className="hover:underline">{c.mascota.nombre}</button>
+                      {' '}<span className="font-sans text-base font-normal text-tinta-500">{c.servicio.nombre}</span>
+                    </h2>
+                  </div>
                   <div className="flex flex-wrap gap-2">
                     {c.origen === 'WHATSAPP'
-                      ? <span className="inline-flex items-center gap-1 rounded-full bg-green-50 px-3 py-1 text-xs font-bold text-green-700"><MessageCircle size={12} /> WhatsApp</span>
-                      : <span className="inline-flex items-center gap-1 rounded-full bg-stone-100 px-3 py-1 text-xs font-bold text-stone-600"><Globe size={12} /> Página web</span>}
+                      ? <span className="inline-flex items-center gap-1 text-xs font-semibold text-tinta-500"><MessageCircle size={13} /> WhatsApp</span>
+                      : <span className="inline-flex items-center gap-1 text-xs font-semibold text-tinta-500"><Globe size={13} /> Web</span>}
                     <span className={`rounded-full px-3 py-1 text-xs font-bold ${estado.clase}`}>{estado.texto}</span>
                   </div>
                 </div>
-                <p className="mt-1 flex flex-wrap gap-x-4 gap-y-1 text-sm text-stone-500">
+                <p className="mt-1 flex flex-wrap gap-x-4 gap-y-1 text-sm text-tinta-500">
                   <span>{c.mascota.cliente.nombre}</span>
                   {c.mascota.cliente.telefono && <span className="inline-flex items-center gap-1"><Phone size={14} /> {c.mascota.cliente.telefono}</span>}
                   <span className="inline-flex items-center gap-1"><Mail size={14} /> {c.mascota.cliente.email}</span>
                 </p>
-                {c.notas && <p className="mt-2 text-stone-700">{c.notas}</p>}
+                {c.notas && <p className="mt-2 text-tinta-700">{c.notas}</p>}
                 <div className="mt-3 flex flex-wrap gap-2">
                   {acciones(c.estado, new Date(c.inicio) <= ahora).map((a) => (
                     <button key={a.estado} type="button" disabled={ocupada === c.id} onClick={() => (a.atender ? setAtendiendo(c.id) : cambiarEstado(c.id, a.estado))}
-                      className={`rounded-xl px-3 py-1.5 text-sm font-bold transition disabled:opacity-50 ${a.principal ? 'bg-teal-600 text-white hover:bg-teal-700' : 'bg-stone-100 text-stone-700 hover:bg-stone-200'}`}>
+                      className={`rounded-xl px-3 py-1.5 text-sm font-bold transition disabled:opacity-50 ${a.principal ? 'bg-pino-600 text-white hover:bg-pino-700' : 'bg-crema-100 text-tinta-700 hover:bg-crema-200'}`}>
                       {a.texto}
                     </button>
                   ))}
