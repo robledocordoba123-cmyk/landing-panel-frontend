@@ -9,6 +9,7 @@ import Login from './Login';
 import Dashboard from './Dashboard';
 import Asistente from './Asistente';
 import Reservar from './Reservar';
+import MiCita from './MiCita';
 
 const SERVICIOS = [
   { icono: Stethoscope, titulo: 'Consulta general', texto: 'Revisión completa, diagnóstico y tratamiento para perros, gatos y otras mascotas.' },
@@ -20,7 +21,7 @@ const SERVICIOS = [
 const PREGUNTAS = [
   { q: '¿Necesito pedir cita?', a: 'Para consulta, vacunación y peluquería sí, así no esperas. Las urgencias se atienden sin cita.' },
   { q: '¿Atienden animales distintos a perros y gatos?', a: 'Sí, también conejos, aves y otras mascotas pequeñas. Cuéntanos qué mascota tienes al reservar.' },
-  { q: '¿Cómo confirmo mi cita?', a: 'Al reservar eliges el día y la hora, y te llamamos para confirmarla el mismo día en horario de atención.' },
+  { q: '¿Cómo confirmo mi cita?', a: 'Al reservar eliges el día y la hora, y te escribimos al confirmarla. Con el enlace de tu reserva puedes cancelarla o cambiarla hasta 2 horas antes.' },
   { q: '¿Qué medios de pago reciben?', a: 'Efectivo, tarjeta, Nequi y transferencia.' },
 ];
 
@@ -259,6 +260,7 @@ function App() {
         <Route path="/login" element={<Login />} />
         <Route path="/admin" element={<Dashboard />} />
         <Route path="/whatsapp" element={<Asistente />} />
+        <Route path="/mi-cita/:token" element={<MiCita />} />
       </Routes>
     </BrowserRouter>
   );
