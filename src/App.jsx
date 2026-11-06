@@ -9,6 +9,7 @@ import Reservar from './Reservar';
 import { Arco } from './Mascota';
 import { Marca } from './Marca';
 import MiCita from './MiCita';
+import Privacidad from './Privacidad';
 
 const SERVICIOS = [
   { titulo: 'Consulta general', texto: 'Revisión completa, diagnóstico y tratamiento para perros, gatos y otras mascotas.', especie: 'Gato', nombre: 'Misha', fondo: 'bg-lila' },
@@ -24,7 +25,7 @@ const PREGUNTAS = [
   { q: '¿Qué medios de pago reciben?', a: 'Efectivo, tarjeta, Nequi y transferencia.' },
 ];
 
-const VACIO = { nombre: '', email: '', mensaje: '' };
+const VACIO = { nombre: '', email: '', mensaje: '', autorizaDatos: false };
 
 function Pregunta({ q, a }) {
   const [abierta, setAbierta] = useState(false);
@@ -192,6 +193,10 @@ function LandingPage() {
                 <label className="text-sm font-semibold text-tinta-700 sm:col-span-2">Tu pregunta
                   <textarea name="mensaje" value={form.mensaje} onChange={cambiar} required minLength={5} maxLength={1000} rows={3} className={`${campo} mt-1`} />
                 </label>
+                <label className="flex items-start gap-2 text-sm text-tinta-700 sm:col-span-2">
+                  <input type="checkbox" checked={form.autorizaDatos} onChange={(e) => setForm({ ...form, autorizaDatos: e.target.checked })} required className="mt-0.5 h-4 w-4 accent-pino-600" />
+                  <span>Autorizo el tratamiento de mis datos según la <Link to="/privacidad" className="font-semibold underline">política de datos</Link>.</span>
+                </label>
                 {error && <p className="text-sm font-medium text-red-600 sm:col-span-2" role="alert">{error}</p>}
                 <button type="submit" disabled={estado === 'enviando'}
                   className="inline-flex items-center justify-center gap-2 rounded-xl bg-pino-600 py-3 font-bold text-white transition hover:bg-pino-700 disabled:opacity-60 sm:col-span-2">
@@ -212,7 +217,10 @@ function LandingPage() {
         <div className="mx-auto flex max-w-6xl flex-col justify-between gap-6 px-5 md:flex-row md:items-center">
           <Marca claro />
           <p className="text-sm">Negocio ficticio de demostración. Diseño y desarrollo: Manuela Córdoba.</p>
-          <Link to="/login" className="inline-flex items-center gap-1 text-sm font-semibold hover:text-white"><Lock size={14} /> Panel del negocio</Link>
+          <div className="flex gap-5 text-sm font-semibold">
+            <Link to="/privacidad" className="hover:text-white">Política de datos</Link>
+            <Link to="/login" className="inline-flex items-center gap-1 hover:text-white"><Lock size={14} /> Panel del negocio</Link>
+          </div>
         </div>
       </footer>
     </div>
@@ -228,6 +236,7 @@ function App() {
         <Route path="/admin" element={<Dashboard />} />
         <Route path="/whatsapp" element={<Asistente />} />
         <Route path="/mi-cita/:token" element={<MiCita />} />
+        <Route path="/privacidad" element={<Privacidad />} />
       </Routes>
     </BrowserRouter>
   );

@@ -1,16 +1,12 @@
-// Cliente de la API. En desarrollo usa http://localhost:3001; al publicar se
-// define VITE_API_URL con la dirección de la API (por ejemplo la de Render).
-const BASE = import.meta.env.VITE_API_URL || 'http://localhost:3001';
-
-export async function api(ruta, { metodo = 'GET', datos, token } = {}) {
+// Cliente de la API. Siempre usa rutas /api de la misma dirección: en desarrollo
+// las redirige Vite y al publicar las redirige Vercel a la API. Así la cookie de
+// sesión es del mismo sitio y el navegador la protege.
+export async function api(ruta, { metodo = 'GET', datos } = {}) {
   let respuesta;
   try {
-    respuesta = await fetch(`${BASE}${ruta}`, {
+    respuesta = await fetch(ruta, {
       method: metodo,
-      headers: {
-        ...(datos ? { 'Content-Type': 'application/json' } : {}),
-        ...(token ? { Authorization: `Bearer ${token}` } : {}),
-      },
+      headers: datos ? { 'Content-Type': 'application/json' } : {},
       body: datos ? JSON.stringify(datos) : undefined,
     });
   } catch {

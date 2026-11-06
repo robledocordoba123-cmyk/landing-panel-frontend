@@ -13,11 +13,11 @@ const ESTADOS = {
 };
 
 // Botones según el estado. "yaEmpezo" evita ofrecer lo que la API rechazaría.
-function acciones(estado, yaEmpezo) {
+function acciones(estado, yaEmpezo, clinica) {
   if (estado === 'PENDIENTE') return [{ estado: 'CONFIRMADA', texto: 'Confirmar', principal: true }, { estado: 'CANCELADA', texto: 'Cancelar' }];
   if (estado !== 'CONFIRMADA') return [];
   if (!yaEmpezo) return [{ estado: 'CANCELADA', texto: 'Cancelar' }];
-  return [{ atender: true, estado: 'ATENDER', texto: 'Atender', principal: true }, { estado: 'NO_ASISTIO', texto: 'No asistió' }, { estado: 'CANCELADA', texto: 'Cancelar' }];
+  return [...(clinica ? [{ atender: true, estado: 'ATENDER', texto: 'Atender', principal: true }] : []), { estado: 'NO_ASISTIO', texto: 'No asistió' }, { estado: 'CANCELADA', texto: 'Cancelar' }];
 }
 
 const fechaHoy = () => new Date(Date.now() - 5 * 60 * 60 * 1000).toISOString().slice(0, 10);
@@ -26,7 +26,8 @@ const fechaLarga = (fecha) => new Date(`${fecha}T12:00:00-05:00`).toLocaleDateSt
 const hora = (inicio) => new Date(inicio).toLocaleTimeString('es-CO', { timeZone: 'America/Bogota', hour: 'numeric', minute: '2-digit' });
 
 // Citas de un día, con los cambios de estado que permite cada una.
-function Agenda({ token, alAbrirMascota, alCaducarSesion }) {
+function Agenda({ usuario, alAbrirMascota, alCaducarSesion }) {
+  const clinica = usuario.rol !== 'RECEPCION';
   const [fecha, setFecha] = useState(fechaHoy());
   const [respuesta, setRespuesta] = useState(null);
   const [error, setError] = useState('');
@@ -36,7 +37,7 @@ function Agenda({ token, alAbrirMascota, alCaducarSesion }) {
 
   useEffect(() => {
     let vigente = true;
-    api(`/api/citas?desde=${fecha}`, { token })
+    api(`/api/citas?desde=${fecha}`)
       .then((d) => {
         if (!vigente) return;
         setRespuesta(d);
@@ -50,13 +51,13 @@ function Agenda({ token, alAbrirMascota, alCaducarSesion }) {
     return () => {
       vigente = false;
     };
-  }, [fecha, version, token, alCaducarSesion]);
+  }, [fecha, version, alCaducarSesion]);
 
   const cambiarEstado = async (id, estado) => {
     setOcupada(id);
     setError('');
     try {
-      await api(`/api/citas/${id}/estado`, { metodo: 'PATCH', datos: { estado }, token });
+      await api(`/api/citas/${id}/estado`, { metodo: 'PATCH', datos: { estado } });
     } catch (err) {
       if (err.estado === 401) return alCaducarSesion();
       setError(err.message);
@@ -125,7 +126,7 @@ function Agenda({ token, alAbrirMascota, alCaducarSesion }) {
                 </p>
                 {c.notas && <p className="mt-2 text-tinta-700">{c.notas}</p>}
                 <div className="mt-3 flex flex-wrap gap-2">
-                  {acciones(c.estado, new Date(c.inicio) <= ahora).map((a) => (
+                  {acciones(c.estado, new Date(c.inicio) <= ahora, clinica).map((a) => (
                     <button key={a.estado} type="button" disabled={ocupada === c.id} onClick={() => (a.atender ? setAtendiendo(c.id) : cambiarEstado(c.id, a.estado))}
                       className={`rounded-xl px-3 py-1.5 text-sm font-bold transition disabled:opacity-50 ${a.principal ? 'bg-pino-600 text-white hover:bg-pino-700' : 'bg-crema-100 text-tinta-700 hover:bg-crema-200'}`}>
                       {a.texto}
@@ -133,7 +134,7 @@ function Agenda({ token, alAbrirMascota, alCaducarSesion }) {
                   ))}
                 </div>
                 {atendiendo === c.id && (
-                  <AtencionForm token={token} mascotaId={c.mascota.id} citaId={c.id} motivoInicial={c.servicio.nombre}
+                  <AtencionForm mascotaId={c.mascota.id} citaId={c.id} motivoInicial={c.servicio.nombre}
                     alGuardar={() => { setAtendiendo(null); setVersion((v) => v + 1); }} alCancelar={() => setAtendiendo(null)} />
                 )}
               </div>

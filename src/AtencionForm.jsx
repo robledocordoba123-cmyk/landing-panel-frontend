@@ -7,7 +7,7 @@ const numero = (v) => (v === '' ? undefined : Number(v));
 
 // Registra una atención en la historia clínica. Si viene de una cita, la API
 // marca esa cita como atendida en la misma operación.
-function AtencionForm({ token, mascotaId, citaId, motivoInicial = '', alGuardar, alCancelar }) {
+function AtencionForm({ mascotaId, citaId, motivoInicial = '', alGuardar, alCancelar }) {
   const [datos, setDatos] = useState({ motivo: motivoInicial, diagnostico: '', tratamiento: '', pesoKg: '', temperaturaC: '' });
   const [enviando, setEnviando] = useState(false);
   const [error, setError] = useState('');
@@ -21,7 +21,6 @@ function AtencionForm({ token, mascotaId, citaId, motivoInicial = '', alGuardar,
     try {
       await api(`/api/mascotas/${mascotaId}/atenciones`, {
         metodo: 'POST',
-        token,
         datos: { ...datos, citaId, pesoKg: numero(datos.pesoKg), temperaturaC: numero(datos.temperaturaC) },
       });
       alGuardar();
