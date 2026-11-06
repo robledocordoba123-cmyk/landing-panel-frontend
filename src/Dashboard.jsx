@@ -1,9 +1,10 @@
 import { useCallback, useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { PawPrint, LogOut, Inbox, CheckCircle2, Mail, Phone, RotateCcw, Clock, MessageCircle, Globe, CalendarDays, Users } from 'lucide-react';
+import { PawPrint, LogOut, Inbox, CheckCircle2, Mail, Phone, RotateCcw, Clock, MessageCircle, Globe, CalendarDays, Users, Send } from 'lucide-react';
 import { api } from './api';
 import Agenda from './Agenda';
 import Clientes from './Clientes';
+import Correos from './Correos';
 import FichaMascota from './FichaMascota';
 
 const FILTROS = [
@@ -99,11 +100,16 @@ function Dashboard() {
             className={`inline-flex items-center gap-2 rounded-xl px-4 py-2 text-sm font-bold transition ${seccion === 'mensajes' ? 'bg-teal-600 text-white' : 'bg-white text-stone-600 hover:bg-stone-100'}`}>
             <Inbox size={16} /> Mensajes {resumen.NUEVO > 0 && <span className="rounded-full bg-amber-400 px-2 text-xs text-stone-900">{resumen.NUEVO}</span>}
           </button>
+          <button type="button" onClick={() => irA('correos')} aria-pressed={seccion === 'correos'}
+            className={`inline-flex items-center gap-2 rounded-xl px-4 py-2 text-sm font-bold transition ${seccion === 'correos' ? 'bg-teal-600 text-white' : 'bg-white text-stone-600 hover:bg-stone-100'}`}>
+            <Send size={16} /> Correos
+          </button>
         </div>
 
         {mascotaAbierta && <FichaMascota token={token} mascotaId={mascotaAbierta} alVolver={() => setMascotaAbierta(null)} alCaducarSesion={salir} />}
         {!mascotaAbierta && seccion === 'agenda' && <Agenda token={token} alAbrirMascota={setMascotaAbierta} alCaducarSesion={salir} />}
         {!mascotaAbierta && seccion === 'clientes' && <Clientes token={token} alAbrirMascota={setMascotaAbierta} alCaducarSesion={salir} />}
+        {!mascotaAbierta && seccion === 'correos' && <Correos token={token} alCaducarSesion={salir} />}
         {!mascotaAbierta && seccion === 'mensajes' && (
         <>
         <h1 className="text-2xl font-extrabold text-stone-900">Mensajes</h1>

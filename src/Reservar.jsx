@@ -1,39 +1,13 @@
 import { useEffect, useState } from 'react';
+import { Link } from 'react-router-dom';
 import { ArrowLeft, CalendarCheck, CheckCircle2, Clock } from 'lucide-react';
 import { api } from './api';
+import { DIAS_MAXIMOS, fechaHoy, fechaLarga, hora, sumarDias, useHorarios } from './horarios';
 
 const DATOS_VACIOS = { nombre: '', email: '', telefono: '', mascota: '', especie: 'Perro', notas: '' };
 const ESPECIES = ['Perro', 'Gato', 'Ave', 'Conejo', 'Otro'];
 const campo = 'mt-1 w-full rounded-xl border border-stone-300 bg-white px-4 py-3 text-stone-800 outline-none transition focus:border-teal-500 focus:ring-4 focus:ring-teal-100';
-const DIAS_MAXIMOS = 60;
-
 const peso = (n) => `$${n.toLocaleString('es-CO')}`;
-// La fecha de hoy en Colombia, aunque el navegador esté en otra zona horaria.
-const fechaHoy = () => new Date(Date.now() - 5 * 60 * 60 * 1000).toISOString().slice(0, 10);
-const sumarDias = (fecha, dias) => new Date(new Date(`${fecha}T00:00:00Z`).getTime() + dias * 86400000).toISOString().slice(0, 10);
-const fechaLarga = (inicio) => new Date(inicio).toLocaleDateString('es-CO', { timeZone: 'America/Bogota', weekday: 'long', day: 'numeric', month: 'long' });
-const hora = (inicio) => new Date(inicio).toLocaleTimeString('es-CO', { timeZone: 'America/Bogota', hour: 'numeric', minute: '2-digit' });
-
-// Lista de horarios libres de un día. Cada consulta nueva vuelve a pedir la
-// lista; la respuesta que llegue tarde de una consulta anterior se ignora.
-function useHorarios(servicioId, fecha, version) {
-  const [resultado, setResultado] = useState({ clave: null, horarios: [], error: '' });
-  const clave = servicioId && fecha ? `${servicioId}|${fecha}|${version}` : null;
-
-  useEffect(() => {
-    if (!clave) return undefined;
-    let vigente = true;
-    api(`/api/disponibilidad?servicioId=${servicioId}&fecha=${fecha}`)
-      .then((d) => vigente && setResultado({ clave, horarios: d.horarios, error: '' }))
-      .catch((err) => vigente && setResultado({ clave, horarios: [], error: err.message }));
-    return () => {
-      vigente = false;
-    };
-  }, [clave, servicioId, fecha]);
-
-  const listo = resultado.clave === clave;
-  return { cargando: Boolean(clave) && !listo, horarios: listo ? resultado.horarios : [], error: listo ? resultado.error : '' };
-}
 
 function Pasos({ actual }) {
   const pasos = ['Servicio', 'Día y hora', 'Tus datos'];
@@ -113,8 +87,9 @@ function Reservar() {
         <p className="mt-3 text-lg font-bold text-teal-800">¡Tu cita quedó reservada!</p>
         <p className="mt-1 font-semibold text-teal-800">{reservada.servicio}</p>
         <p className="text-teal-700 first-letter:uppercase">{fechaLarga(reservada.inicio)}, {hora(reservada.inicio)}</p>
-        <p className="mt-2 text-sm text-teal-700">Te llamaremos para confirmarla.</p>
-        <button type="button" onClick={reiniciar} className="mt-4 text-sm font-semibold text-teal-700 underline">Reservar otra cita</button>
+        <p className="mt-2 text-sm text-teal-700">Te escribiremos al confirmarla. Guarda este enlace por si necesitas cancelarla o cambiarla:</p>
+        <Link to={`/mi-cita/${reservada.token}`} className="mt-2 inline-block rounded-xl bg-teal-600 px-4 py-2 text-sm font-bold text-white hover:bg-teal-700">Ver mi cita</Link>
+        <button type="button" onClick={reiniciar} className="mt-4 block w-full text-sm font-semibold text-teal-700 underline">Reservar otra cita</button>
       </div>
     );
   }
