@@ -96,9 +96,9 @@ function LandingPage() {
           </div>
 
           <div className="asomarse grid grid-cols-3 items-end gap-3" aria-hidden="true">
-            <Arco especie="Gato" nombre="Misha" fondo="bg-lila" className="h-44 sm:h-60 lg:h-[19rem]" />
-            <Arco especie="Perro" nombre="Toby" fondo="bg-mantequilla" className="h-60 sm:h-80 lg:h-[28rem]" />
-            <Arco especie="Conejo" nombre="Copito" fondo="bg-menta" className="h-52 sm:h-72 lg:h-[23rem]" />
+            <Arco especie="Gato" nombre="Misha" fondo="bg-lila" className="h-36 sm:h-52 lg:h-52" />
+            <Arco especie="Perro" nombre="Toby" fondo="bg-mantequilla" className="h-48 sm:h-64 lg:h-72" />
+            <Arco especie="Conejo" nombre="Copito" fondo="bg-menta" className="h-44 sm:h-56 lg:h-60" />
           </div>
         </div>
       </section>
