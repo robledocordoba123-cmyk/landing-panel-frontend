@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
-import { CalendarDays, ChevronLeft, ChevronRight, Globe, Mail, MessageCircle, Phone } from 'lucide-react';
+import { CalendarDays, ChevronLeft, ChevronRight, Globe, Mail, MessageCircle, PawPrint, Phone } from 'lucide-react';
 import { api } from './api';
+import AtencionForm from './AtencionForm';
 
 const ESTADOS = {
   PENDIENTE: { texto: 'Pendiente', clase: 'bg-amber-100 text-amber-800' },
@@ -15,7 +16,7 @@ function acciones(estado, yaEmpezo) {
   if (estado === 'PENDIENTE') return [{ estado: 'CONFIRMADA', texto: 'Confirmar', principal: true }, { estado: 'CANCELADA', texto: 'Cancelar' }];
   if (estado !== 'CONFIRMADA') return [];
   if (!yaEmpezo) return [{ estado: 'CANCELADA', texto: 'Cancelar' }];
-  return [{ estado: 'ATENDIDA', texto: 'Marcar atendida', principal: true }, { estado: 'NO_ASISTIO', texto: 'No asistió' }, { estado: 'CANCELADA', texto: 'Cancelar' }];
+  return [{ atender: true, estado: 'ATENDER', texto: 'Atender', principal: true }, { estado: 'NO_ASISTIO', texto: 'No asistió' }, { estado: 'CANCELADA', texto: 'Cancelar' }];
 }
 
 const fechaHoy = () => new Date(Date.now() - 5 * 60 * 60 * 1000).toISOString().slice(0, 10);
@@ -24,11 +25,12 @@ const fechaLarga = (fecha) => new Date(`${fecha}T12:00:00-05:00`).toLocaleDateSt
 const hora = (inicio) => new Date(inicio).toLocaleTimeString('es-CO', { timeZone: 'America/Bogota', hour: 'numeric', minute: '2-digit' });
 
 // Citas de un día, con los cambios de estado que permite cada una.
-function Agenda({ token, alCaducarSesion }) {
+function Agenda({ token, alAbrirMascota, alCaducarSesion }) {
   const [fecha, setFecha] = useState(fechaHoy());
   const [respuesta, setRespuesta] = useState(null);
   const [error, setError] = useState('');
   const [ocupada, setOcupada] = useState(null);
+  const [atendiendo, setAtendiendo] = useState(null);
   const [version, setVersion] = useState(0);
 
   useEffect(() => {
@@ -99,7 +101,10 @@ function Agenda({ token, alCaducarSesion }) {
               <p className="font-extrabold text-teal-700">{hora(c.inicio)}<span className="block text-xs font-medium text-stone-400">{c.servicio.duracionMin} min</span></p>
               <div>
                 <div className="flex flex-wrap items-start justify-between gap-2">
-                  <h2 className="font-bold text-stone-900">{c.mascota} <span className="font-normal text-stone-500">· {c.servicio.nombre}</span></h2>
+                  <h2 className="font-bold text-stone-900">
+                    <button type="button" onClick={() => alAbrirMascota(c.mascota.id)} className="inline-flex items-center gap-1 hover:text-teal-700 hover:underline"><PawPrint size={14} /> {c.mascota.nombre}</button>
+                    {' '}<span className="font-normal text-stone-500">· {c.mascota.especie} · {c.servicio.nombre}</span>
+                  </h2>
                   <div className="flex flex-wrap gap-2">
                     {c.origen === 'WHATSAPP'
                       ? <span className="inline-flex items-center gap-1 rounded-full bg-green-50 px-3 py-1 text-xs font-bold text-green-700"><MessageCircle size={12} /> WhatsApp</span>
@@ -108,19 +113,23 @@ function Agenda({ token, alCaducarSesion }) {
                   </div>
                 </div>
                 <p className="mt-1 flex flex-wrap gap-x-4 gap-y-1 text-sm text-stone-500">
-                  <span>{c.nombre}</span>
-                  {c.telefono && <span className="inline-flex items-center gap-1"><Phone size={14} /> {c.telefono}</span>}
-                  <span className="inline-flex items-center gap-1"><Mail size={14} /> {c.email}</span>
+                  <span>{c.mascota.cliente.nombre}</span>
+                  {c.mascota.cliente.telefono && <span className="inline-flex items-center gap-1"><Phone size={14} /> {c.mascota.cliente.telefono}</span>}
+                  <span className="inline-flex items-center gap-1"><Mail size={14} /> {c.mascota.cliente.email}</span>
                 </p>
                 {c.notas && <p className="mt-2 text-stone-700">{c.notas}</p>}
                 <div className="mt-3 flex flex-wrap gap-2">
                   {acciones(c.estado, new Date(c.inicio) <= ahora).map((a) => (
-                    <button key={a.estado} type="button" disabled={ocupada === c.id} onClick={() => cambiarEstado(c.id, a.estado)}
+                    <button key={a.estado} type="button" disabled={ocupada === c.id} onClick={() => (a.atender ? setAtendiendo(c.id) : cambiarEstado(c.id, a.estado))}
                       className={`rounded-xl px-3 py-1.5 text-sm font-bold transition disabled:opacity-50 ${a.principal ? 'bg-teal-600 text-white hover:bg-teal-700' : 'bg-stone-100 text-stone-700 hover:bg-stone-200'}`}>
                       {a.texto}
                     </button>
                   ))}
                 </div>
+                {atendiendo === c.id && (
+                  <AtencionForm token={token} mascotaId={c.mascota.id} citaId={c.id} motivoInicial={c.servicio.nombre}
+                    alGuardar={() => { setAtendiendo(null); setVersion((v) => v + 1); }} alCancelar={() => setAtendiendo(null)} />
+                )}
               </div>
             </article>
           );

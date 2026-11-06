@@ -2,7 +2,8 @@ import { useEffect, useState } from 'react';
 import { ArrowLeft, CalendarCheck, CheckCircle2, Clock } from 'lucide-react';
 import { api } from './api';
 
-const DATOS_VACIOS = { nombre: '', email: '', telefono: '', mascota: '', notas: '' };
+const DATOS_VACIOS = { nombre: '', email: '', telefono: '', mascota: '', especie: 'Perro', notas: '' };
+const ESPECIES = ['Perro', 'Gato', 'Ave', 'Conejo', 'Otro'];
 const campo = 'mt-1 w-full rounded-xl border border-stone-300 bg-white px-4 py-3 text-stone-800 outline-none transition focus:border-teal-500 focus:ring-4 focus:ring-teal-100';
 const DIAS_MAXIMOS = 60;
 
@@ -181,8 +182,13 @@ function Reservar() {
           <label className="text-sm font-semibold text-stone-700">Correo
             <input type="email" name="email" value={datos.email} onChange={cambiar} required autoComplete="email" className={campo} />
           </label>
-          <label className="text-sm font-semibold text-stone-700">Tu mascota <span className="font-normal text-stone-400">(nombre y especie)</span>
-            <input name="mascota" value={datos.mascota} onChange={cambiar} required minLength={2} maxLength={60} placeholder="Ej.: Toby, perro" className={campo} />
+          <label className="text-sm font-semibold text-stone-700">Nombre de tu mascota
+            <input name="mascota" value={datos.mascota} onChange={cambiar} required maxLength={60} className={campo} />
+          </label>
+          <label className="text-sm font-semibold text-stone-700">¿Qué animal es?
+            <select name="especie" value={datos.especie} onChange={cambiar} className={campo}>
+              {ESPECIES.map((e) => <option key={e}>{e}</option>)}
+            </select>
           </label>
           <label className="text-sm font-semibold text-stone-700 sm:col-span-2">¿Algo que debamos saber? <span className="font-normal text-stone-400">(opcional)</span>
             <textarea name="notas" value={datos.notas} onChange={cambiar} maxLength={500} rows={3} className={campo} />

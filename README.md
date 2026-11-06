@@ -8,7 +8,7 @@ Página web para un negocio local (una veterinaria **ficticia**, creada como pro
 
 - **Landing page adaptable al celular:** servicios, horarios, preguntas frecuentes y botón "Pedir cita" siempre a la vista.
 - **Reserva en tres pasos:** servicio, día y hora (solo horarios realmente libres) y datos de contacto.
-- **Panel del negocio:** agenda por día para confirmar, cancelar y marcar citas como atendidas o no asistió, y bandeja de mensajes con su origen (página o WhatsApp).
+- **Panel del negocio:** agenda por día, clientes con buscador, ficha de cada mascota con historia clínica y carné de vacunas para imprimir, aviso de vacunas por renovar y bandeja de mensajes.
 - La sesión vence sola y, si el token ya no sirve, el panel devuelve al login.
 - **Asistente de WhatsApp** (`/whatsapp`): simulador con apariencia de WhatsApp que habla con el mismo bot que atiende el WhatsApp real. Agenda citas, responde servicios y horarios, y pasa a una persona. Las citas que agenda llegan al panel con la etiqueta "WhatsApp".
 
