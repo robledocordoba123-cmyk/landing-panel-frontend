@@ -1,18 +1,32 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { PawPrint, LogIn, ArrowLeft } from 'lucide-react';
+import { PawPrint, LogIn, ArrowLeft, Coffee } from 'lucide-react';
 import { api } from './api';
 
 // En la demo pública se muestra la cuenta de prueba (VITE_MODO_DEMO=true).
 const MODO_DEMO = import.meta.env.VITE_MODO_DEMO === 'true';
 const DEMO = { email: 'admin@huellitas.demo', password: 'Huellitas2026!' };
 
+// El plan gratuito del hosting apaga la API tras un rato sin uso y tarda cerca
+// de un minuto en encender: si la respuesta se demora, se explica por qué.
+const MS_ANTES_DE_AVISAR = 4000;
+
 function Login() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
   const [cargando, setCargando] = useState(false);
+  const [despertando, setDespertando] = useState(false);
   const navigate = useNavigate();
+
+  useEffect(() => {
+    if (!cargando) return undefined;
+    const temporizador = setTimeout(() => setDespertando(true), MS_ANTES_DE_AVISAR);
+    return () => {
+      clearTimeout(temporizador);
+      setDespertando(false);
+    };
+  }, [cargando]);
 
   const entrar = async (credenciales) => {
     setError('');
@@ -45,6 +59,12 @@ function Login() {
           <label className="block text-sm font-semibold text-stone-700">Contraseña
             <input type="password" value={password} onChange={(e) => setPassword(e.target.value)} required className={campo} />
           </label>
+          {despertando && (
+            <p className="flex items-start gap-2 rounded-xl border border-amber-200 bg-amber-50 px-3 py-2 text-sm text-amber-800">
+              <Coffee size={16} className="mt-0.5 shrink-0" aria-hidden="true" />
+              El servidor estaba en reposo y está encendiendo. La primera entrada puede tardar hasta un minuto.
+            </p>
+          )}
           {error && <p className="text-sm font-medium text-red-600" role="alert">{error}</p>}
           <button type="submit" disabled={cargando} className="inline-flex w-full items-center justify-center gap-2 rounded-xl bg-teal-600 py-3 font-bold text-white transition hover:bg-teal-700 disabled:opacity-60">
             <LogIn size={18} /> {cargando ? 'Entrando…' : 'Iniciar sesión'}
