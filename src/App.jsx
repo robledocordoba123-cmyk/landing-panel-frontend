@@ -8,22 +8,23 @@ import { api } from './api';
 import Login from './Login';
 import Dashboard from './Dashboard';
 import Asistente from './Asistente';
+import Reservar from './Reservar';
 
 const SERVICIOS = [
   { icono: Stethoscope, titulo: 'Consulta general', texto: 'Revisión completa, diagnóstico y tratamiento para perros, gatos y otras mascotas.' },
-  { icono: Syringe, titulo: 'Vacunación', texto: 'Plan de vacunas y desparasitación al día, con carné digital para tu mascota.' },
+  { icono: Syringe, titulo: 'Vacunación', texto: 'Plan de vacunas y desparasitación al día para tu mascota.' },
   { icono: Scissors, titulo: 'Peluquería', texto: 'Baño, corte y limpieza de oídos y uñas, con productos suaves para su piel.' },
   { icono: Siren, titulo: 'Urgencias', texto: 'Atención prioritaria cuando tu mascota lo necesita, todos los días.' },
 ];
 
 const PREGUNTAS = [
   { q: '¿Necesito pedir cita?', a: 'Para consulta, vacunación y peluquería sí, así no esperas. Las urgencias se atienden sin cita.' },
-  { q: '¿Atienden animales distintos a perros y gatos?', a: 'Sí, también conejos, aves y otras mascotas pequeñas. Cuéntanos en el formulario qué mascota tienes.' },
-  { q: '¿Cuánto tardan en responder?', a: 'Respondemos las solicitudes el mismo día en horario de atención, por correo o por teléfono.' },
+  { q: '¿Atienden animales distintos a perros y gatos?', a: 'Sí, también conejos, aves y otras mascotas pequeñas. Cuéntanos qué mascota tienes al reservar.' },
+  { q: '¿Cómo confirmo mi cita?', a: 'Al reservar eliges el día y la hora, y te llamamos para confirmarla el mismo día en horario de atención.' },
   { q: '¿Qué medios de pago reciben?', a: 'Efectivo, tarjeta, Nequi y transferencia.' },
 ];
 
-const VACIO = { nombre: '', email: '', telefono: '', mascota: '', servicio: 'Consulta general', mensaje: '' };
+const VACIO = { nombre: '', email: '', mensaje: '' };
 
 function Pregunta({ q, a }) {
   const [abierta, setAbierta] = useState(false);
@@ -94,7 +95,7 @@ function LandingPage() {
               Cuidamos a tu mascota <span className="text-teal-600">como si fuera nuestra</span>
             </h1>
             <p className="mt-5 max-w-lg text-lg text-stone-600">
-              Consultas, vacunas, peluquería y urgencias en un solo lugar. Pide tu cita en un minuto y te confirmamos el mismo día.
+              Consultas, vacunas, peluquería y urgencias en un solo lugar. Elige día y hora en un minuto y te confirmamos el mismo día.
             </p>
             <div className="mt-8 flex flex-wrap gap-3">
               <a href="#cita" className="inline-flex items-center gap-2 rounded-xl bg-teal-600 px-6 py-3 font-bold text-white shadow-lg shadow-teal-600/20 transition hover:bg-teal-700">
@@ -125,8 +126,8 @@ function LandingPage() {
             <div className="absolute -bottom-5 right-0 flex items-center gap-3 rounded-2xl bg-white px-4 py-3 shadow-xl">
               <span className="grid h-10 w-10 place-items-center rounded-xl bg-teal-50 text-teal-600"><ShieldCheck size={20} /></span>
               <div>
-                <p className="text-sm font-bold text-stone-800">Vacunas al día</p>
-                <p className="text-xs text-stone-500">Carné digital de tu mascota</p>
+                <p className="text-sm font-bold text-stone-800">Agenda abierta</p>
+                <p className="text-xs text-stone-500">Elige el día y la hora en línea</p>
               </div>
             </div>
           </div>
@@ -183,51 +184,15 @@ function LandingPage() {
           </div>
 
           <div id="cita" className="scroll-mt-24 rounded-3xl bg-white p-6 shadow-xl shadow-stone-200 md:p-8 lg:col-span-3">
-            <h2 className="text-2xl font-extrabold text-stone-900">Pide tu cita</h2>
-            <p className="mt-1 text-stone-600">Déjanos tus datos y te confirmamos la hora el mismo día.</p>
+            <h2 className="text-2xl font-extrabold text-stone-900">Reserva tu cita</h2>
+            <p className="mt-1 text-stone-600">Elige el servicio, el día y la hora que te sirvan.</p>
             {/* En la demo pública cualquiera puede ver el panel: se pide no usar datos reales. */}
             {import.meta.env.VITE_MODO_DEMO === 'true' && (
               <p className="mt-3 rounded-xl bg-amber-50 px-4 py-2 text-sm text-amber-800">
                 Esta es una demo pública: lo que envíes se ve en el panel de demostración. No escribas tu correo ni tu teléfono reales.
               </p>
             )}
-
-            {estado === 'enviado' ? (
-              <div className="mt-6 rounded-2xl bg-teal-50 p-6 text-center" role="status">
-                <CheckCircle2 size={40} className="mx-auto text-teal-600" />
-                <p className="mt-3 text-lg font-bold text-teal-800">¡Recibimos tu solicitud!</p>
-                <p className="text-teal-700">Te escribiremos pronto para confirmar la cita.</p>
-                <button type="button" onClick={() => setEstado('listo')} className="mt-4 text-sm font-semibold text-teal-700 underline">Enviar otra solicitud</button>
-              </div>
-            ) : (
-              <form onSubmit={enviar} className="mt-6 grid gap-4 sm:grid-cols-2">
-                <label className="text-sm font-semibold text-stone-700">Tu nombre
-                  <input name="nombre" value={form.nombre} onChange={cambiar} required minLength={2} maxLength={80} className={`${campo} mt-1`} />
-                </label>
-                <label className="text-sm font-semibold text-stone-700">Correo
-                  <input type="email" name="email" value={form.email} onChange={cambiar} required className={`${campo} mt-1`} />
-                </label>
-                <label className="text-sm font-semibold text-stone-700">Teléfono <span className="font-normal text-stone-400">(opcional)</span>
-                  <input type="tel" name="telefono" value={form.telefono} onChange={cambiar} className={`${campo} mt-1`} />
-                </label>
-                <label className="text-sm font-semibold text-stone-700">Tu mascota <span className="font-normal text-stone-400">(nombre y especie)</span>
-                  <input name="mascota" value={form.mascota} onChange={cambiar} maxLength={60} placeholder="Ej.: Toby, perro" className={`${campo} mt-1`} />
-                </label>
-                <label className="text-sm font-semibold text-stone-700 sm:col-span-2">Servicio
-                  <select name="servicio" value={form.servicio} onChange={cambiar} className={`${campo} mt-1`}>
-                    {[...SERVICIOS.map((s) => s.titulo), 'Otro'].map((s) => <option key={s}>{s}</option>)}
-                  </select>
-                </label>
-                <label className="text-sm font-semibold text-stone-700 sm:col-span-2">¿Qué necesitas?
-                  <textarea name="mensaje" value={form.mensaje} onChange={cambiar} required minLength={5} maxLength={1000} rows={4} className={`${campo} mt-1`} />
-                </label>
-                {error && <p className="text-sm font-medium text-red-600 sm:col-span-2" role="alert">{error}</p>}
-                <button type="submit" disabled={estado === 'enviando'}
-                  className="inline-flex items-center justify-center gap-2 rounded-xl bg-teal-600 py-3 font-bold text-white transition hover:bg-teal-700 disabled:opacity-60 sm:col-span-2">
-                  <Send size={18} /> {estado === 'enviando' ? 'Enviando…' : 'Enviar solicitud'}
-                </button>
-              </form>
-            )}
+            <Reservar />
           </div>
         </div>
       </section>
@@ -238,6 +203,34 @@ function LandingPage() {
           <h2 className="text-center text-3xl font-extrabold text-stone-900">Preguntas frecuentes</h2>
           <div className="mt-10 rounded-2xl border border-stone-200 bg-stone-50 px-6">
             {PREGUNTAS.map((p) => <Pregunta key={p.q} {...p} />)}
+          </div>
+
+          <div className="mt-10 rounded-2xl border border-stone-200 p-6">
+            <h3 className="text-lg font-extrabold text-stone-900">¿Tienes otra pregunta?</h3>
+            <p className="text-stone-600">Escríbenos y te respondemos por correo.</p>
+            {estado === 'enviado' ? (
+              <div className="mt-4 rounded-xl bg-teal-50 p-4 text-teal-800" role="status">
+                <p className="flex items-center gap-2 font-bold"><CheckCircle2 size={18} /> ¡Recibimos tu mensaje!</p>
+                <button type="button" onClick={() => setEstado('listo')} className="mt-1 text-sm font-semibold underline">Enviar otro</button>
+              </div>
+            ) : (
+              <form onSubmit={enviar} className="mt-4 grid gap-4 sm:grid-cols-2">
+                <label className="text-sm font-semibold text-stone-700">Tu nombre
+                  <input name="nombre" value={form.nombre} onChange={cambiar} required minLength={2} maxLength={80} autoComplete="name" className={`${campo} mt-1`} />
+                </label>
+                <label className="text-sm font-semibold text-stone-700">Correo
+                  <input type="email" name="email" value={form.email} onChange={cambiar} required autoComplete="email" className={`${campo} mt-1`} />
+                </label>
+                <label className="text-sm font-semibold text-stone-700 sm:col-span-2">Tu pregunta
+                  <textarea name="mensaje" value={form.mensaje} onChange={cambiar} required minLength={5} maxLength={1000} rows={3} className={`${campo} mt-1`} />
+                </label>
+                {error && <p className="text-sm font-medium text-red-600 sm:col-span-2" role="alert">{error}</p>}
+                <button type="submit" disabled={estado === 'enviando'}
+                  className="inline-flex items-center justify-center gap-2 rounded-xl border border-teal-600 py-3 font-bold text-teal-700 transition hover:bg-teal-50 disabled:opacity-60 sm:col-span-2">
+                  <Send size={18} /> {estado === 'enviando' ? 'Enviando…' : 'Enviar pregunta'}
+                </button>
+              </form>
+            )}
           </div>
         </div>
       </section>

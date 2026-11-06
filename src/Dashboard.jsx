@@ -1,7 +1,8 @@
 import { useCallback, useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { PawPrint, LogOut, Inbox, CheckCircle2, Mail, Phone, RotateCcw, Clock, MessageCircle, Globe } from 'lucide-react';
+import { PawPrint, LogOut, Inbox, CheckCircle2, Mail, Phone, RotateCcw, Clock, MessageCircle, Globe, CalendarDays } from 'lucide-react';
 import { api } from './api';
+import Agenda from './Agenda';
 
 const FILTROS = [
   { valor: '', texto: 'Todas' },
@@ -11,9 +12,10 @@ const FILTROS = [
 
 const fecha = (f) => new Date(f).toLocaleString('es-CO', { dateStyle: 'medium', timeStyle: 'short' });
 
-// Panel del negocio: solicitudes de cita que llegan desde la página, con el
-// conteo por estado y el botón para marcarlas como atendidas.
+// Panel del negocio: la agenda de citas y los mensajes que llegan desde la
+// página y por WhatsApp (preguntas, urgencias y pedidos de hablar con alguien).
 function Dashboard() {
+  const [seccion, setSeccion] = useState('agenda');
   const [datos, setDatos] = useState(null);
   const [filtro, setFiltro] = useState('');
   const [error, setError] = useState('');
@@ -76,8 +78,21 @@ function Dashboard() {
       </header>
 
       <main className="mx-auto max-w-5xl px-5 py-8">
-        <h1 className="text-2xl font-extrabold text-stone-900">Solicitudes de cita</h1>
-        <p className="text-stone-600">Lo que tus clientes envían desde la página y por WhatsApp.</p>
+        <div className="mb-6 flex gap-2" role="group" aria-label="Secciones del panel">
+          <button type="button" onClick={() => setSeccion('agenda')} aria-pressed={seccion === 'agenda'}
+            className={`inline-flex items-center gap-2 rounded-xl px-4 py-2 text-sm font-bold transition ${seccion === 'agenda' ? 'bg-teal-600 text-white' : 'bg-white text-stone-600 hover:bg-stone-100'}`}>
+            <CalendarDays size={16} /> Agenda
+          </button>
+          <button type="button" onClick={() => setSeccion('mensajes')} aria-pressed={seccion === 'mensajes'}
+            className={`inline-flex items-center gap-2 rounded-xl px-4 py-2 text-sm font-bold transition ${seccion === 'mensajes' ? 'bg-teal-600 text-white' : 'bg-white text-stone-600 hover:bg-stone-100'}`}>
+            <Inbox size={16} /> Mensajes {resumen.NUEVO > 0 && <span className="rounded-full bg-amber-400 px-2 text-xs text-stone-900">{resumen.NUEVO}</span>}
+          </button>
+        </div>
+
+        {seccion === 'agenda' ? <Agenda token={token} alCaducarSesion={salir} /> : (
+        <>
+        <h1 className="text-2xl font-extrabold text-stone-900">Mensajes</h1>
+        <p className="text-stone-600">Preguntas, urgencias y pedidos de atención que llegan desde la página y por WhatsApp.</p>
 
         <div className="mt-6 grid gap-4 sm:grid-cols-2">
           <div className="flex items-center gap-4 rounded-2xl bg-white p-5 shadow-sm">
@@ -90,7 +105,7 @@ function Dashboard() {
           </div>
         </div>
 
-        <div className="mt-8 flex flex-wrap gap-2" role="group" aria-label="Filtrar solicitudes">
+        <div className="mt-8 flex flex-wrap gap-2" role="group" aria-label="Filtrar mensajes">
           {FILTROS.map((f) => (
             <button key={f.valor} onClick={() => setFiltro(f.valor)} aria-pressed={filtro === f.valor}
               className={`rounded-xl px-4 py-2 text-sm font-semibold transition ${filtro === f.valor ? 'bg-teal-600 text-white' : 'bg-white text-stone-600 hover:bg-stone-100'}`}>
@@ -105,7 +120,7 @@ function Dashboard() {
           {!datos ? (
             <p className="py-10 text-center text-stone-400">Cargando…</p>
           ) : datos.mensajes.length === 0 ? (
-            <p className="rounded-2xl border border-dashed border-stone-300 py-10 text-center text-stone-500">No hay solicitudes aquí.</p>
+            <p className="rounded-2xl border border-dashed border-stone-300 py-10 text-center text-stone-500">No hay mensajes aquí.</p>
           ) : (
             datos.mensajes.map((m) => (
               <article key={m.id} className={`rounded-2xl bg-white p-5 shadow-sm ${m.estado === 'NUEVO' ? 'border-l-4 border-amber-400' : 'opacity-80'}`}>
@@ -143,6 +158,8 @@ function Dashboard() {
             ))
           )}
         </div>
+        </>
+        )}
       </main>
     </div>
   );
