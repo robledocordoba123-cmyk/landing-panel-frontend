@@ -1,8 +1,10 @@
 import { useCallback, useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { PawPrint, LogOut, Inbox, CheckCircle2, Mail, Phone, RotateCcw, Clock, MessageCircle, Globe, CalendarDays } from 'lucide-react';
+import { PawPrint, LogOut, Inbox, CheckCircle2, Mail, Phone, RotateCcw, Clock, MessageCircle, Globe, CalendarDays, Users } from 'lucide-react';
 import { api } from './api';
 import Agenda from './Agenda';
+import Clientes from './Clientes';
+import FichaMascota from './FichaMascota';
 
 const FILTROS = [
   { valor: '', texto: 'Todas' },
@@ -16,6 +18,7 @@ const fecha = (f) => new Date(f).toLocaleString('es-CO', { dateStyle: 'medium', 
 // página y por WhatsApp (preguntas, urgencias y pedidos de hablar con alguien).
 function Dashboard() {
   const [seccion, setSeccion] = useState('agenda');
+  const [mascotaAbierta, setMascotaAbierta] = useState(null);
   const [datos, setDatos] = useState(null);
   const [filtro, setFiltro] = useState('');
   const [error, setError] = useState('');
@@ -63,9 +66,14 @@ function Dashboard() {
 
   const resumen = datos?.resumen || { NUEVO: 0, ATENDIDO: 0 };
 
+  const irA = (nueva) => {
+    setMascotaAbierta(null);
+    setSeccion(nueva);
+  };
+
   return (
     <div className="min-h-screen bg-stone-50">
-      <header className="border-b border-stone-200 bg-white">
+      <header className="border-b border-stone-200 bg-white print:hidden">
         <div className="mx-auto flex max-w-5xl items-center justify-between px-5 py-3">
           <p className="flex items-center gap-2 text-lg font-extrabold text-teal-700">
             <span className="grid h-9 w-9 place-items-center rounded-xl bg-teal-600 text-white"><PawPrint size={20} /></span>
@@ -78,18 +86,25 @@ function Dashboard() {
       </header>
 
       <main className="mx-auto max-w-5xl px-5 py-8">
-        <div className="mb-6 flex gap-2" role="group" aria-label="Secciones del panel">
-          <button type="button" onClick={() => setSeccion('agenda')} aria-pressed={seccion === 'agenda'}
+        <div className="mb-6 flex flex-wrap gap-2 print:hidden" role="group" aria-label="Secciones del panel">
+          <button type="button" onClick={() => irA('agenda')} aria-pressed={seccion === 'agenda'}
             className={`inline-flex items-center gap-2 rounded-xl px-4 py-2 text-sm font-bold transition ${seccion === 'agenda' ? 'bg-teal-600 text-white' : 'bg-white text-stone-600 hover:bg-stone-100'}`}>
             <CalendarDays size={16} /> Agenda
           </button>
-          <button type="button" onClick={() => setSeccion('mensajes')} aria-pressed={seccion === 'mensajes'}
+          <button type="button" onClick={() => irA('clientes')} aria-pressed={seccion === 'clientes'}
+            className={`inline-flex items-center gap-2 rounded-xl px-4 py-2 text-sm font-bold transition ${seccion === 'clientes' ? 'bg-teal-600 text-white' : 'bg-white text-stone-600 hover:bg-stone-100'}`}>
+            <Users size={16} /> Clientes
+          </button>
+          <button type="button" onClick={() => irA('mensajes')} aria-pressed={seccion === 'mensajes'}
             className={`inline-flex items-center gap-2 rounded-xl px-4 py-2 text-sm font-bold transition ${seccion === 'mensajes' ? 'bg-teal-600 text-white' : 'bg-white text-stone-600 hover:bg-stone-100'}`}>
             <Inbox size={16} /> Mensajes {resumen.NUEVO > 0 && <span className="rounded-full bg-amber-400 px-2 text-xs text-stone-900">{resumen.NUEVO}</span>}
           </button>
         </div>
 
-        {seccion === 'agenda' ? <Agenda token={token} alCaducarSesion={salir} /> : (
+        {mascotaAbierta && <FichaMascota token={token} mascotaId={mascotaAbierta} alVolver={() => setMascotaAbierta(null)} alCaducarSesion={salir} />}
+        {!mascotaAbierta && seccion === 'agenda' && <Agenda token={token} alAbrirMascota={setMascotaAbierta} alCaducarSesion={salir} />}
+        {!mascotaAbierta && seccion === 'clientes' && <Clientes token={token} alAbrirMascota={setMascotaAbierta} alCaducarSesion={salir} />}
+        {!mascotaAbierta && seccion === 'mensajes' && (
         <>
         <h1 className="text-2xl font-extrabold text-stone-900">Mensajes</h1>
         <p className="text-stone-600">Preguntas, urgencias y pedidos de atención que llegan desde la página y por WhatsApp.</p>
