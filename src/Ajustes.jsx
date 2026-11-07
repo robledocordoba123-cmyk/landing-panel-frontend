@@ -136,7 +136,7 @@ function Servicios({ alCaducarSesion }) {
         {!servicios && !error && <li className="py-6 text-center text-tinta-400">Cargando…</li>}
         {servicios?.map((s) => (
           <li key={s.id} className="py-4">
-            <div className={`flex flex-wrap items-start justify-between gap-3 ${s.activo ? '' : 'opacity-60'}`}>
+            <div className="flex flex-wrap items-start justify-between gap-3">
               <div>
                 <h3 className="font-bold text-tinta-900">
                   {s.nombre}

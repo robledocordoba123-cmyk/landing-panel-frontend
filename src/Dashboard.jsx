@@ -175,7 +175,7 @@ function Dashboard() {
             <p className="rounded-2xl border border-dashed border-tinta-300 py-10 text-center text-tinta-500">No hay mensajes aquí.</p>
           ) : (
             datos.mensajes.map((m) => (
-              <article key={m.id} className={`rounded-2xl bg-white p-5 ${m.estado === 'NUEVO' ? 'border-l-4 border-mandarina-500' : 'opacity-80'}`}>
+              <article key={m.id} className={`rounded-2xl p-5 ${m.estado === 'NUEVO' ? 'border-l-4 border-mandarina-500 bg-white' : 'border border-dashed border-tinta-300 bg-crema-50'}`}>
                 <div className="flex flex-wrap items-start justify-between gap-3">
                   <div>
                     <h2 className="font-bold text-tinta-900">{m.nombre}{m.mascota && <span className="font-normal text-tinta-500"> · {m.mascota}</span>}</h2>

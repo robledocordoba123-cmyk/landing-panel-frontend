@@ -16,6 +16,7 @@ export default defineConfig({
     locale: 'es-CO',
     timezoneId: 'America/Bogota',
     trace: 'retain-on-failure',
+    reducedMotion: 'reduce',
   },
   projects: [
     { name: 'escritorio', use: { ...devices['Desktop Chrome'] } },

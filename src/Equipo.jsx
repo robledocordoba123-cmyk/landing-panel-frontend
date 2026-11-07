@@ -153,9 +153,9 @@ function Equipo({ usuario, alCaducarSesion }) {
       <div className="mt-5 space-y-3">
         {!cuentas && !error && <p className="py-10 text-center text-tinta-400">Cargando…</p>}
         {cuentas?.map((c) => (
-          <article key={c.id} className={`flex flex-wrap items-center justify-between gap-3 rounded-3xl bg-white p-5 ${c.activo ? '' : 'opacity-60'}`}>
+          <article key={c.id} className={`flex flex-wrap items-center justify-between gap-3 rounded-3xl p-5 ${c.activo ? 'bg-white' : 'border border-dashed border-tinta-300 bg-crema-50'}`}>
             <div>
-              <h2 className="text-lg font-bold text-tinta-900">{c.nombre}{c.id === usuario.id && <span className="font-sans text-sm font-normal text-tinta-500"> · Tú</span>}</h2>
+              <h2 className="text-lg font-bold text-tinta-900">{c.nombre}{c.id === usuario.id && <span className="font-sans text-sm font-normal text-tinta-500"> · Tú</span>}{!c.activo && <span className="ml-2 rounded-full bg-tinta-200 px-2 py-0.5 font-sans text-xs font-bold text-tinta-700">Inactiva</span>}</h2>
               <p className="text-sm text-tinta-500">{c.email}</p>
             </div>
             <div className="flex items-center gap-2">
