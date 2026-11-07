@@ -25,7 +25,7 @@
   --color-tinta-700: #37463f;
   --color-tinta-600: #4d5b54;
   --color-tinta-500: #5f6c65;
-  --color-tinta-400: #8c968f;
+  --color-tinta-400: #67726b; /* 4.5:1 sobre blanco y crema (WCAG AA) */
   --color-tinta-300: #cdccbd;
   --color-tinta-200: #e6e1d2;
   --color-tinta-100: #f3ecdd;
@@ -74,5 +74,17 @@
 @media (prefers-reduced-motion: reduce) {
   .asomarse svg {
     animation: none;
+  }
+}
+
+/* Quien pide menos movimiento en su sistema no ve transiciones ni animaciones. */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  ::before,
+  ::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
   }
 }

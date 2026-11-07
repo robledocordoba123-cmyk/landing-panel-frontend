@@ -121,7 +121,7 @@ function Agenda({ usuario, alAbrirMascota, alCaducarSesion }) {
         {citas?.map((c) => {
           const estado = ESTADOS[c.estado];
           return (
-            <article key={c.id} className={`grid grid-cols-[4.5rem_1fr] gap-x-4 gap-y-2 rounded-3xl bg-white p-4 sm:grid-cols-[5.5rem_1fr] sm:p-5 ${c.estado === 'CANCELADA' ? 'opacity-60' : ''}`}>
+            <article key={c.id} className={`grid grid-cols-[4.5rem_1fr] gap-x-4 gap-y-2 rounded-3xl p-4 sm:grid-cols-[5.5rem_1fr] sm:p-5 ${c.estado === 'CANCELADA' ? 'border border-dashed border-tinta-300 bg-crema-50' : 'bg-white'}`}>
               <button type="button" onClick={() => alAbrirMascota(c.mascota.id)} aria-label={`Abrir la ficha de ${c.mascota.nombre}`} className="self-start">
                 <Arco especie={c.mascota.especie} nombre={c.mascota.nombre} className="h-20 w-full sm:h-24" />
               </button>

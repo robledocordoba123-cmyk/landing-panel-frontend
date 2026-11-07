@@ -60,7 +60,7 @@ function AgendaSemana({ fecha, hoy, alElegirDia, alCaducarSesion }) {
               {lista.map((c) => (
                 <li key={c.id}>
                   <button type="button" onClick={() => alElegirDia(dia)} title={`${ESTADOS[c.estado].texto}: ${c.mascota.nombre}, ${c.servicio.nombre}`}
-                    className={`w-full rounded-lg border-l-4 bg-crema-50 px-2 py-1.5 text-left text-xs hover:bg-crema-100 ${ESTADOS[c.estado].borde} ${c.estado === 'CANCELADA' ? 'line-through opacity-60' : ''}`}>
+                    className={`w-full rounded-lg border-l-4 px-2 py-1.5 text-left text-xs hover:bg-crema-100 ${ESTADOS[c.estado].borde} ${c.estado === 'CANCELADA' ? 'bg-white line-through' : 'bg-crema-50'}`}>
                     <span className="block font-bold text-tinta-900">{hora(c.inicio)}</span>
                     <span className="block truncate text-tinta-700">{c.mascota.nombre} · {c.servicio.nombre}</span>
                     <span className="sr-only">{ESTADOS[c.estado].texto}</span>

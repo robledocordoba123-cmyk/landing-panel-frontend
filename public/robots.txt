@@ -1,0 +1,10 @@
+# La página y la política de datos son públicas. El panel, el inicio de sesión y
+# los enlaces de cada cita son privados.
+User-agent: *
+Allow: /
+Disallow: /admin
+Disallow: /login
+Disallow: /mi-cita/
+Disallow: /api/
+
+Sitemap: https://huellitas-veterinaria.vercel.app/sitemap.xml

@@ -43,10 +43,16 @@ Variables (ver `.env.example`):
 | `VITE_API_URL` | Dirección de la API al publicar (en local no hace falta) |
 | `VITE_MODO_DEMO` | `true` muestra en el login el botón de la cuenta de demostración y, en el formulario, el aviso de no escribir datos reales |
 
+## Página pública: buscadores, velocidad y accesibilidad
+
+- **Buscadores y redes:** título y descripción por página, imagen para compartir (`public/og.png`), `robots.txt`, `sitemap.xml` y datos estructurados `VeterinaryCare` con el horario real de la API. El panel, el login y los enlaces de cada cita piden no aparecer en Google.
+- **Carga por partes:** de entrada solo se descarga la página principal; el panel, el asistente y las demás páginas llegan cuando alguien las abre. Los archivos con huella se guardan un año en caché, y si una pestaña vieja pide una parte que ya no existe, se recarga sola una vez.
+- **Accesibilidad:** cada página y cada sección del panel se revisan con axe (WCAG 2.1 AA) en las pruebas de punta a punta. Los textos secundarios cumplen 4.5:1 de contraste, lo cancelado se distingue sin transparencias y quien pide menos movimiento no ve animaciones.
+
 ## Pruebas
 
 - **Componentes** (Vitest + Testing Library, `npm test`): la reserva en sus tres pasos, la autorización de datos obligatoria, el día cerrado, el horario que otra persona tomó, los reportes, los ajustes con citas en conflicto, el paginador, la pantalla de error y la 404.
-- **De punta a punta** (Playwright, `npx playwright test`): un navegador real reserva en la página, abre el enlace del cliente y el equipo confirma la cita en el panel; también revisa los permisos de recepción, los reportes y la 404. Corre en computador y en celular contra la API real con PostgreSQL.
+- **De punta a punta** (Playwright, `npx playwright test`): un navegador real reserva en la página, abre el enlace del cliente y el equipo confirma la cita en el panel; también revisa los permisos de recepción, los reportes, la 404 y la accesibilidad de cada pantalla con axe. Corre en computador y en celular contra la API real con PostgreSQL.
 - **En CI** corren el lint, las pruebas y la compilación en cada cambio; las de punta a punta levantan la API (rama `main` del backend) con los datos de la demo.
 
 Para las de punta a punta en local: enciende la API con los datos de la demo y corre `E2E_API_URL=http://localhost:3001 npx playwright test`.

@@ -1,16 +1,12 @@
-import { useState } from 'react';
+import { lazy, Suspense, useState } from 'react';
 import { BrowserRouter, Routes, Route, Link } from 'react-router-dom';
 import { CalendarCheck, CheckCircle2, ChevronDown, Clock, Lock, MapPin, MessageCircle, Phone, Send } from 'lucide-react';
 import { api } from './api';
-import Login from './Login';
-import Dashboard from './Dashboard';
-import Asistente from './Asistente';
 import Reservar from './Reservar';
 import { Arco } from './Mascota';
 import { Marca } from './Marca';
-import MiCita from './MiCita';
-import NoEncontrada from './NoEncontrada';
-import Privacidad from './Privacidad';
+import MetaPagina from './MetaPagina';
+import DatosEstructurados from './DatosEstructurados';
 import { useHorarioNegocio } from './horarios';
 
 const SERVICIOS = [
@@ -26,6 +22,15 @@ const PREGUNTAS = [
   { q: '¿Cómo confirmo mi cita?', a: 'Al reservar eliges el día y la hora, y te escribimos al confirmarla. Con el enlace de tu reserva puedes cancelarla o cambiarla hasta 2 horas antes.' },
   { q: '¿Qué medios de pago reciben?', a: 'Efectivo, tarjeta, Nequi y transferencia.' },
 ];
+
+// Solo la página principal se descarga de entrada: el panel, el asistente y las
+// demás páginas llegan cuando alguien las abre.
+const Login = lazy(() => import('./Login'));
+const Dashboard = lazy(() => import('./Dashboard'));
+const Asistente = lazy(() => import('./Asistente'));
+const MiCita = lazy(() => import('./MiCita'));
+const Privacidad = lazy(() => import('./Privacidad'));
+const NoEncontrada = lazy(() => import('./NoEncontrada'));
 
 const VACIO = { nombre: '', email: '', mensaje: '', autorizaDatos: false };
 
@@ -72,6 +77,8 @@ function LandingPage() {
 
   return (
     <div className="min-h-screen bg-crema-100 text-tinta-800">
+      <MetaPagina ruta="/" />
+      <DatosEstructurados jornadas={horario?.jornadas} />
       <a href="#cita" className="sr-only focus:not-sr-only focus:absolute focus:left-4 focus:top-4 focus:z-50 focus:rounded-lg focus:bg-white focus:px-4 focus:py-2">Ir a reservar una cita</a>
 
       <header className="sticky top-0 z-20 bg-crema-100">
@@ -135,7 +142,7 @@ function LandingPage() {
               <li className="flex gap-4">
                 <span className="grid h-11 w-11 shrink-0 place-items-center rounded-xl bg-mantequilla text-tinta-900"><Clock size={20} /></span>
                 <dl>
-                  {(horario || HORARIO_INICIAL).map((linea) => {
+                  {(horario?.lineas || HORARIO_INICIAL).map((linea) => {
                     const [dias, horas] = linea.split(': ');
                     return (
                       <div key={linea} className="mb-1">
@@ -241,15 +248,17 @@ function LandingPage() {
 function App() {
   return (
     <BrowserRouter>
-      <Routes>
-        <Route path="/" element={<LandingPage />} />
-        <Route path="/login" element={<Login />} />
-        <Route path="/admin" element={<Dashboard />} />
-        <Route path="/whatsapp" element={<Asistente />} />
-        <Route path="/mi-cita/:token" element={<MiCita />} />
-        <Route path="/privacidad" element={<Privacidad />} />
-        <Route path="*" element={<NoEncontrada />} />
-      </Routes>
+      <Suspense fallback={<p className="grid min-h-screen place-items-center bg-crema-100 text-tinta-500">Cargando…</p>}>
+        <Routes>
+          <Route path="/" element={<LandingPage />} />
+          <Route path="/login" element={<><MetaPagina titulo="Entrar al panel" privada /><Login /></>} />
+          <Route path="/admin" element={<><MetaPagina titulo="Panel" privada /><Dashboard /></>} />
+          <Route path="/whatsapp" element={<><MetaPagina titulo="Asistente de WhatsApp" privada /><Asistente /></>} />
+          <Route path="/mi-cita/:token" element={<><MetaPagina titulo="Tu cita" privada /><MiCita /></>} />
+          <Route path="/privacidad" element={<><MetaPagina titulo="Política de datos" ruta="/privacidad" /><Privacidad /></>} />
+          <Route path="*" element={<><MetaPagina titulo="Página no encontrada" privada /><NoEncontrada /></>} />
+        </Routes>
+      </Suspense>
     </BrowserRouter>
   );
 }

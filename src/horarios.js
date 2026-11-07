@@ -33,15 +33,15 @@ export function useHorarios(servicioId, fecha, version) {
   return { cargando: Boolean(clave) && !listo, horarios: listo ? resultado.horarios : [], cerrado: listo ? resultado.cerrado : null, error: listo ? resultado.error : '' };
 }
 
-// Horario del negocio en frases, tal como se configura en el panel.
+// Horario del negocio (frases y jornada de cada día), tal como se configura en el panel.
 export function useHorarioNegocio() {
-  const [lineas, setLineas] = useState(null);
+  const [horario, setHorario] = useState(null);
   useEffect(() => {
     let vigente = true;
-    api('/api/horario').then((d) => vigente && setLineas(d.lineas)).catch(() => {});
+    api('/api/horario').then((d) => vigente && setHorario(d)).catch(() => {});
     return () => {
       vigente = false;
     };
   }, []);
-  return lineas;
+  return horario;
 }

@@ -5,6 +5,7 @@ import { MemoryRouter } from 'react-router-dom';
 import Paginador from './Paginador';
 import LimiteDeError from './LimiteDeError';
 import NoEncontrada from './NoEncontrada';
+import MetaPagina from './MetaPagina';
 
 describe('Paginador', () => {
   test('no deja ir antes de la primera ni después de la última página', async () => {
@@ -39,8 +40,9 @@ describe('Límite de error', () => {
 });
 
 test('la página 404 pide no indexarse y ofrece volver', () => {
-  render(<MemoryRouter><NoEncontrada /></MemoryRouter>);
+  render(<MemoryRouter><MetaPagina titulo="Página no encontrada" privada /><NoEncontrada /></MemoryRouter>);
   expect(screen.getByRole('heading', { name: 'Esta página se nos escapó.' })).toBeInTheDocument();
-  expect(document.querySelector('meta[name="robots"]')).toHaveAttribute('content', 'noindex');
+  expect(document.querySelector('meta[name="robots"]')).toHaveAttribute('content', 'noindex, nofollow');
+  expect(document.title).toBe('Página no encontrada · Huellitas Veterinaria');
   expect(screen.getByRole('link', { name: 'Reservar una cita' })).toHaveAttribute('href', '/#cita');
 });
