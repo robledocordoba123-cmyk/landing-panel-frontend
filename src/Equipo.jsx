@@ -18,6 +18,11 @@ const ACCIONES = {
   CITA_ESTADO: 'Cambió el estado de una cita',
   USUARIO_CREADO: 'Creó una cuenta',
   USUARIO_EDITADO: 'Editó una cuenta',
+  HORARIO_EDITADO: 'Cambió el horario',
+  CIERRE_CREADO: 'Cerró un día',
+  CIERRE_BORRADO: 'Volvió a abrir un día',
+  SERVICIO_CREADO: 'Creó un servicio',
+  SERVICIO_EDITADO: 'Editó un servicio',
 };
 const campo = 'mt-1 w-full rounded-xl border border-tinta-300 bg-white px-3 py-2 text-tinta-800 outline-none focus:border-pino-500 focus:ring-4 focus:ring-pino-100';
 const VACIO = { nombre: '', email: '', rol: 'RECEPCION', password: '' };

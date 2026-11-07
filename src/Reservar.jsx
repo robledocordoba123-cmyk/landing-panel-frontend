@@ -38,7 +38,7 @@ function Reservar() {
   // Sube cuando alguien gana un horario, para traer otra vez los libres.
   const [version, setVersion] = useState(0);
 
-  const { cargando, horarios, error: errorHorarios } = useHorarios(servicio?.id, fecha, version);
+  const { cargando, horarios, cerrado, error: errorHorarios } = useHorarios(servicio?.id, fecha, version);
 
   useEffect(() => {
     let vigente = true;
@@ -126,7 +126,7 @@ function Reservar() {
           {errorHorarios && <p className="mt-3 text-sm font-medium text-red-600" role="alert">{errorHorarios}</p>}
           {cargando && <p className="py-6 text-center text-tinta-500">Buscando horarios libres…</p>}
           {!cargando && !errorHorarios && horarios.length === 0 && (
-            <p className="mt-4 rounded-xl border border-dashed border-tinta-300 px-4 py-6 text-center text-tinta-500">No quedan horarios libres ese día. Prueba con otro.</p>
+            <p className="mt-4 rounded-xl border border-dashed border-tinta-300 px-4 py-6 text-center text-tinta-500">{cerrado ? `Ese día estamos cerrados: ${cerrado}. Prueba con otro.` : 'No quedan horarios libres ese día. Prueba con otro.'}</p>
           )}
           {!cargando && horarios.length > 0 && (
             <>

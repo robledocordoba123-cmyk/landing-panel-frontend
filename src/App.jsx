@@ -11,6 +11,7 @@ import { Marca } from './Marca';
 import MiCita from './MiCita';
 import NoEncontrada from './NoEncontrada';
 import Privacidad from './Privacidad';
+import { useHorarioNegocio } from './horarios';
 
 const SERVICIOS = [
   { titulo: 'Consulta general', texto: 'Revisión completa, diagnóstico y tratamiento para perros, gatos y otras mascotas.', especie: 'Gato', nombre: 'Misha', fondo: 'bg-lila' },
@@ -28,6 +29,9 @@ const PREGUNTAS = [
 
 const VACIO = { nombre: '', email: '', mensaje: '', autorizaDatos: false };
 
+// Mientras llega el horario real (la API puede estar despertando), se muestra el de siempre.
+const HORARIO_INICIAL = ['Lunes a sábado: 8:00 a. m. – 7:00 p. m.', 'Domingos y festivos: 9:00 a. m. – 2:00 p. m.', 'Urgencias: todos los días'];
+
 function Pregunta({ q, a }) {
   const [abierta, setAbierta] = useState(false);
   return (
@@ -43,6 +47,7 @@ function Pregunta({ q, a }) {
 }
 
 function LandingPage() {
+  const horario = useHorarioNegocio();
   const [form, setForm] = useState(VACIO);
   const [estado, setEstado] = useState('listo'); // listo | enviando | enviado
   const [error, setError] = useState('');
@@ -129,12 +134,17 @@ function LandingPage() {
             <ul className="mt-8 space-y-5">
               <li className="flex gap-4">
                 <span className="grid h-11 w-11 shrink-0 place-items-center rounded-xl bg-mantequilla text-tinta-900"><Clock size={20} /></span>
-                <div>
-                  <p className="font-bold">Lunes a sábado</p>
-                  <p className="text-tinta-600">8:00 a. m. – 7:00 p. m.</p>
-                  <p className="mt-1 font-bold">Domingos y festivos</p>
-                  <p className="text-tinta-600">9:00 a. m. – 2:00 p. m. · Urgencias todo el día</p>
-                </div>
+                <dl>
+                  {(horario || HORARIO_INICIAL).map((linea) => {
+                    const [dias, horas] = linea.split(': ');
+                    return (
+                      <div key={linea} className="mb-1">
+                        <dt className="font-bold">{dias}</dt>
+                        <dd className="text-tinta-600 first-letter:uppercase">{horas}</dd>
+                      </div>
+                    );
+                  })}
+                </dl>
               </li>
               <li className="flex gap-4">
                 <span className="grid h-11 w-11 shrink-0 place-items-center rounded-xl bg-lila text-tinta-900"><MapPin size={20} /></span>

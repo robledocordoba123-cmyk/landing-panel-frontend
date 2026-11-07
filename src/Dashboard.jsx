@@ -1,8 +1,10 @@
 import { useCallback, useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { LogOut, Inbox, CheckCircle2, Mail, Phone, RotateCcw, Clock, MessageCircle, Globe, CalendarDays, Users, Send, ShieldCheck } from 'lucide-react';
+import { LogOut, Inbox, CheckCircle2, Mail, Phone, RotateCcw, Clock, MessageCircle, Globe, CalendarDays, ChartColumn, Users, Send, Settings, ShieldCheck } from 'lucide-react';
 import { api } from './api';
 import Agenda from './Agenda';
+import Ajustes from './Ajustes';
+import Reportes from './Reportes';
 import { Marca } from './Marca';
 import { Arco } from './Mascota';
 import Clientes from './Clientes';
@@ -15,6 +17,8 @@ const SECCIONES = [
   { valor: 'clientes', texto: 'Clientes', icono: Users, roles: ['ADMIN', 'VETERINARIO', 'RECEPCION'] },
   { valor: 'mensajes', texto: 'Mensajes', icono: Inbox, roles: ['ADMIN', 'VETERINARIO', 'RECEPCION'] },
   { valor: 'correos', texto: 'Correos', icono: Send, roles: ['ADMIN', 'RECEPCION'] },
+  { valor: 'reportes', texto: 'Reportes', icono: ChartColumn, roles: ['ADMIN'] },
+  { valor: 'ajustes', texto: 'Ajustes', icono: Settings, roles: ['ADMIN'] },
   { valor: 'equipo', texto: 'Equipo', icono: ShieldCheck, roles: ['ADMIN'] },
 ];
 const ROLES = { ADMIN: 'Administración', VETERINARIO: 'Veterinario', RECEPCION: 'Recepción' };
@@ -121,12 +125,14 @@ function Dashboard() {
         </div>
       </aside>
 
-      <main className="mx-auto w-full max-w-4xl px-5 py-8 lg:px-10 lg:py-10 print:max-w-none print:p-0">
+      <main className="mx-auto w-full max-w-5xl px-5 py-8 lg:px-10 lg:py-10 print:max-w-none print:p-0">
         {mascotaAbierta && <FichaMascota usuario={usuario} mascotaId={mascotaAbierta} alVolver={() => setMascotaAbierta(null)} alCaducarSesion={irALogin} />}
         {!mascotaAbierta && seccion === 'agenda' && <Agenda usuario={usuario} alAbrirMascota={setMascotaAbierta} alCaducarSesion={irALogin} />}
         {!mascotaAbierta && seccion === 'clientes' && <Clientes usuario={usuario} alAbrirMascota={setMascotaAbierta} alCaducarSesion={irALogin} />}
         {!mascotaAbierta && seccion === 'correos' && <Correos alCaducarSesion={irALogin} />}
         {!mascotaAbierta && seccion === 'equipo' && <Equipo usuario={usuario} alCaducarSesion={irALogin} />}
+        {!mascotaAbierta && seccion === 'reportes' && <Reportes alCaducarSesion={irALogin} />}
+        {!mascotaAbierta && seccion === 'ajustes' && <Ajustes alCaducarSesion={irALogin} />}
         {!mascotaAbierta && seccion === 'mensajes' && (
         <>
         <h1 className="text-4xl font-extrabold text-pino-700">Mensajes</h1>

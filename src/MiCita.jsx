@@ -21,7 +21,7 @@ function CambiarFecha({ token, cita, alCambiar, alCerrar }) {
   const [version, setVersion] = useState(0);
   const [enviando, setEnviando] = useState(false);
   const [error, setError] = useState('');
-  const { cargando, horarios, error: errorHorarios } = useHorarios(cita.servicioId, fecha, version);
+  const { cargando, horarios, cerrado, error: errorHorarios } = useHorarios(cita.servicioId, fecha, version);
   const hoy = fechaHoy();
 
   const cambiar = async (inicio) => {
@@ -43,7 +43,7 @@ function CambiarFecha({ token, cita, alCambiar, alCerrar }) {
       </label>
       {(error || errorHorarios) && <p className="mt-3 text-sm font-medium text-red-600" role="alert">{error || errorHorarios}</p>}
       {cargando && <p className="py-4 text-center text-tinta-500">Buscando horarios libres…</p>}
-      {!cargando && !errorHorarios && horarios.length === 0 && <p className="mt-3 text-tinta-500">No quedan horarios libres ese día. Prueba con otro.</p>}
+      {!cargando && !errorHorarios && horarios.length === 0 && <p className="mt-3 text-tinta-500">{cerrado ? `Ese día estamos cerrados: ${cerrado}. Prueba con otro.` : 'No quedan horarios libres ese día. Prueba con otro.'}</p>}
       {!cargando && horarios.length > 0 && (
         <div className="mt-3 grid grid-cols-3 gap-2">
           {horarios.map((h) => (
