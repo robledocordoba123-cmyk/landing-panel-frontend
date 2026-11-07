@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
-import { ChevronLeft, ChevronRight, UserPlus } from 'lucide-react';
+import { UserPlus } from 'lucide-react';
 import { api } from './api';
+import Paginador from './Paginador';
 
 const ROLES = { ADMIN: 'Administración', VETERINARIO: 'Veterinario', RECEPCION: 'Recepción' };
 const ACCIONES = {
@@ -45,13 +46,7 @@ function Bitacora({ alCaducarSesion }) {
     <div className="mt-10">
       <div className="flex items-center justify-between gap-3">
         <h2 className="text-2xl font-extrabold text-pino-700">Bitácora</h2>
-        {datos && (
-          <div className="flex items-center gap-2 text-sm text-tinta-600">
-            <button type="button" disabled={pagina <= 1} onClick={() => setPagina(pagina - 1)} aria-label="Página anterior" className="grid h-9 w-9 place-items-center rounded-full bg-white disabled:opacity-40"><ChevronLeft size={16} /></button>
-            {datos.pagina} de {datos.paginas}
-            <button type="button" disabled={pagina >= datos.paginas} onClick={() => setPagina(pagina + 1)} aria-label="Página siguiente" className="grid h-9 w-9 place-items-center rounded-full bg-white disabled:opacity-40"><ChevronRight size={16} /></button>
-          </div>
-        )}
+        {datos && <Paginador pagina={datos.pagina} paginas={datos.paginas} alCambiar={setPagina} />}
       </div>
       <p className="text-tinta-600">Quién hizo qué. No se puede modificar ni borrar.</p>
       {error && <p className="mt-3 text-red-700" role="alert">{error}</p>}

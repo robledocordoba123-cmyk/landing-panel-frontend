@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react';
 import { AlertTriangle, ChevronRight, Search } from 'lucide-react';
 import { api } from './api';
 import { Arco } from './Mascota';
+import Paginador from './Paginador';
 
 const hoy = () => new Date(Date.now() - 5 * 60 * 60 * 1000).toISOString().slice(0, 10);
 const fechaCorta = (f) => new Date(f).toLocaleDateString('es-CO', { timeZone: 'UTC', day: 'numeric', month: 'short', year: 'numeric' });
@@ -10,7 +11,8 @@ const MS_ESPERA_BUSQUEDA = 300;
 // Lista de clientes con buscador, y aviso de vacunas vencidas o por vencer.
 function Clientes({ usuario, alAbrirMascota, alCaducarSesion }) {
   const [busqueda, setBusqueda] = useState('');
-  const [clientes, setClientes] = useState(null);
+  const [pagina, setPagina] = useState(1);
+  const [datos, setDatos] = useState(null);
   const [vacunas, setVacunas] = useState([]);
   const [error, setError] = useState('');
   const [porSuprimir, setPorSuprimir] = useState(null);
@@ -20,10 +22,10 @@ function Clientes({ usuario, alAbrirMascota, alCaducarSesion }) {
     let vigente = true;
     // Espera a que dejen de escribir, para no consultar por cada letra.
     const espera = setTimeout(() => {
-      api(`/api/clientes?q=${encodeURIComponent(busqueda)}`)
+      api(`/api/clientes?q=${encodeURIComponent(busqueda)}&pagina=${pagina}`)
         .then((d) => {
           if (!vigente) return;
-          setClientes(d);
+          setDatos(d);
           setError('');
         })
         .catch((err) => {
@@ -36,7 +38,7 @@ function Clientes({ usuario, alAbrirMascota, alCaducarSesion }) {
       vigente = false;
       clearTimeout(espera);
     };
-  }, [busqueda, version, alCaducarSesion]);
+  }, [busqueda, pagina, version, alCaducarSesion]);
 
   useEffect(() => {
     let vigente = true;
@@ -47,6 +49,14 @@ function Clientes({ usuario, alAbrirMascota, alCaducarSesion }) {
       vigente = false;
     };
   }, []);
+
+  // Una búsqueda nueva empieza desde la primera página.
+  const buscar = (e) => {
+    setBusqueda(e.target.value);
+    setPagina(1);
+  };
+
+  const clientes = datos?.clientes;
 
   const suprimir = async (id) => {
     setError('');
@@ -86,11 +96,18 @@ function Clientes({ usuario, alAbrirMascota, alCaducarSesion }) {
       <label className="relative mt-5 block">
         <span className="sr-only">Buscar clientes</span>
         <Search size={18} className="absolute left-3 top-1/2 -translate-y-1/2 text-tinta-400" aria-hidden="true" />
-        <input type="search" value={busqueda} onChange={(e) => setBusqueda(e.target.value)} maxLength={80} placeholder="Buscar por nombre, teléfono, correo o mascota"
+        <input type="search" value={busqueda} onChange={buscar} maxLength={80} placeholder="Buscar por nombre, teléfono, correo o mascota"
           className="w-full rounded-xl border border-tinta-300 bg-white py-3 pl-10 pr-4 outline-none focus:border-pino-500 focus:ring-4 focus:ring-pino-100" />
       </label>
 
       {error && <p className="mt-4 text-red-600" role="alert">{error}</p>}
+
+      {datos && datos.total > 0 && (
+        <div className="mt-4 flex items-center justify-between gap-3">
+          <p className="text-sm text-tinta-500" role="status">{datos.total} {datos.total === 1 ? 'cliente' : 'clientes'}</p>
+          {datos.paginas > 1 && <Paginador pagina={datos.pagina} paginas={datos.paginas} alCambiar={setPagina} />}
+        </div>
+      )}
 
       <div className="mt-4 space-y-3">
         {!clientes && !error && <p className="py-10 text-center text-tinta-400">Cargando…</p>}
