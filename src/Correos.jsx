@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
 import { BellRing, Mail } from 'lucide-react';
 import { api } from './api';
+import Paginador from './Paginador';
 
 const TIPOS = { RESERVA: 'Reserva recibida', CONFIRMADA: 'Cita confirmada', REPROGRAMADA: 'Cita cambiada', RECORDATORIO: 'Recordatorio', CANCELADA: 'Cita cancelada' };
 const ESTADOS = {
@@ -17,10 +18,11 @@ function Correos({ alCaducarSesion }) {
   const [resultado, setResultado] = useState('');
   const [enviando, setEnviando] = useState(false);
   const [version, setVersion] = useState(0);
+  const [pagina, setPagina] = useState(1);
 
   useEffect(() => {
     let vigente = true;
-    api('/api/notificaciones')
+    api(`/api/notificaciones?pagina=${pagina}`)
       .then((d) => vigente && setDatos(d))
       .catch((err) => {
         if (!vigente) return;
@@ -30,7 +32,7 @@ function Correos({ alCaducarSesion }) {
     return () => {
       vigente = false;
     };
-  }, [version, alCaducarSesion]);
+  }, [version, pagina, alCaducarSesion]);
 
   const enviarRecordatorios = async () => {
     setEnviando(true);
@@ -66,6 +68,13 @@ function Correos({ alCaducarSesion }) {
       )}
       {resultado && <p className="mt-4 rounded-xl bg-pino-50 px-4 py-3 text-sm font-medium text-pino-800" role="status">{resultado}</p>}
       {error && <p className="mt-4 text-red-600" role="alert">{error}</p>}
+
+      {datos?.paginas > 1 && (
+        <div className="mt-5 flex items-center justify-between">
+          <p className="text-sm text-tinta-500">{datos.total} correos</p>
+          <Paginador pagina={datos.pagina} paginas={datos.paginas} alCambiar={setPagina} />
+        </div>
+      )}
 
       <div className="mt-5 space-y-2">
         {!datos && !error && <p className="py-10 text-center text-tinta-400">Cargando…</p>}

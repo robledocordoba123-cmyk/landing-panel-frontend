@@ -26,3 +26,7 @@ dist-ssr
 # Variables de entorno
 .env
 .env.local
+
+# Pruebas de punta a punta
+playwright-report/
+test-results/
