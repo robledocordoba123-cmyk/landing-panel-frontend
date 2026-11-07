@@ -9,6 +9,7 @@ import Reservar from './Reservar';
 import { Arco } from './Mascota';
 import { Marca } from './Marca';
 import MiCita from './MiCita';
+import NoEncontrada from './NoEncontrada';
 import Privacidad from './Privacidad';
 
 const SERVICIOS = [
@@ -237,6 +238,7 @@ function App() {
         <Route path="/whatsapp" element={<Asistente />} />
         <Route path="/mi-cita/:token" element={<MiCita />} />
         <Route path="/privacidad" element={<Privacidad />} />
+        <Route path="*" element={<NoEncontrada />} />
       </Routes>
     </BrowserRouter>
   );
