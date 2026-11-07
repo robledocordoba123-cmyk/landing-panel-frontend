@@ -1,4 +1,5 @@
-# En cada push y Pull Request: revisa el estilo del código y compila la web.
+# En cada push y Pull Request: estilo, pruebas de componentes, compilación y pruebas
+# de punta a punta contra la API real (rama main del backend) y un PostgreSQL.
 name: CI
 
 on:
@@ -7,7 +8,7 @@ on:
 
 jobs:
   web:
-    name: Web (lint + build)
+    name: Web (lint + pruebas + build)
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -17,4 +18,62 @@ jobs:
           cache: npm
       - run: npm ci
       - run: npm run lint
+      - run: npm test
       - run: npm run build
+
+  e2e:
+    name: De punta a punta (Playwright)
+    runs-on: ubuntu-latest
+    services:
+      postgres:
+        image: postgres:16-alpine
+        env:
+          POSTGRES_USER: huellitas
+          POSTGRES_PASSWORD: huellitas_dev
+          POSTGRES_DB: huellitas
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd "pg_isready -U huellitas -d huellitas"
+          --health-interval 5s
+          --health-timeout 5s
+          --health-retries 10
+    env:
+      DATABASE_URL: postgresql://huellitas:huellitas_dev@localhost:5432/huellitas?schema=public
+      E2E_API_URL: http://localhost:3001
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/checkout@v4
+        with:
+          repository: robledocordoba123-cmyk/landing-panel-backend
+          path: api
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - name: Preparar la API con los datos de la demo
+        working-directory: api
+        run: |
+          npm ci
+          npx prisma migrate deploy
+          DEMO=true node scripts/demo.js
+      - name: Encender la API
+        working-directory: api
+        env:
+          JWT_SECRET: secreto-solo-para-ci
+          MODO_DEMO: 'true'
+          PORT: '3001'
+        run: |
+          nohup node index.js > ../api.log 2>&1 &
+          for i in $(seq 1 30); do curl -sf http://localhost:3001/api/salud && exit 0; sleep 1; done
+          cat ../api.log; exit 1
+      - run: npm ci
+      - run: npx playwright install --with-deps chromium
+      - run: npx playwright test
+      - uses: actions/upload-artifact@v4
+        if: failure()
+        with:
+          name: reporte-playwright
+          path: |
+            playwright-report/
+            api.log
+          retention-days: 7

@@ -11,6 +11,7 @@ import Clientes from './Clientes';
 import Correos from './Correos';
 import Equipo from './Equipo';
 import FichaMascota from './FichaMascota';
+import Paginador from './Paginador';
 
 const SECCIONES = [
   { valor: 'agenda', texto: 'Agenda', icono: CalendarDays, roles: ['ADMIN', 'VETERINARIO', 'RECEPCION'] },
@@ -38,6 +39,7 @@ function Dashboard() {
   const [mascotaAbierta, setMascotaAbierta] = useState(null);
   const [datos, setDatos] = useState(null);
   const [filtro, setFiltro] = useState('');
+  const [paginaMensajes, setPaginaMensajes] = useState(1);
   const [error, setError] = useState('');
   const navigate = useNavigate();
   const [usuario, setUsuario] = useState(null);
@@ -65,7 +67,7 @@ function Dashboard() {
   useEffect(() => {
     if (!usuario) return undefined;
     let vigente = true;
-    api(`/api/mensajes${filtro ? `?estado=${filtro}` : ''}`)
+    api(`/api/mensajes?pagina=${paginaMensajes}${filtro ? `&estado=${filtro}` : ''}`)
       .then((d) => {
         if (!vigente) return;
         setDatos(d);
@@ -79,7 +81,7 @@ function Dashboard() {
     return () => {
       vigente = false;
     };
-  }, [usuario, filtro, version, irALogin]);
+  }, [usuario, filtro, paginaMensajes, version, irALogin]);
 
   const cambiarEstado = async (id, estado) => {
     try {
@@ -151,7 +153,7 @@ function Dashboard() {
 
         <div className="mt-8 flex flex-wrap gap-2" role="group" aria-label="Filtrar mensajes">
           {FILTROS.map((f) => (
-            <button key={f.valor} onClick={() => setFiltro(f.valor)} aria-pressed={filtro === f.valor}
+            <button key={f.valor} onClick={() => { setFiltro(f.valor); setPaginaMensajes(1); }} aria-pressed={filtro === f.valor}
               className={`rounded-xl px-4 py-2 text-sm font-semibold transition ${filtro === f.valor ? 'bg-pino-600 text-white' : 'bg-white text-tinta-600 hover:bg-tinta-100'}`}>
               {f.texto}
             </button>
@@ -159,6 +161,12 @@ function Dashboard() {
         </div>
 
         {error && <p className="mt-4 text-red-600" role="alert">{error}</p>}
+
+        {datos?.paginas > 1 && (
+          <div className="mt-4 flex justify-end">
+            <Paginador pagina={datos.pagina} paginas={datos.paginas} alCambiar={setPaginaMensajes} />
+          </div>
+        )}
 
         <div className="mt-4 space-y-3">
           {!datos ? (

@@ -43,6 +43,14 @@ Variables (ver `.env.example`):
 | `VITE_API_URL` | Dirección de la API al publicar (en local no hace falta) |
 | `VITE_MODO_DEMO` | `true` muestra en el login el botón de la cuenta de demostración y, en el formulario, el aviso de no escribir datos reales |
 
+## Pruebas
+
+- **Componentes** (Vitest + Testing Library, `npm test`): la reserva en sus tres pasos, la autorización de datos obligatoria, el día cerrado, el horario que otra persona tomó, los reportes, los ajustes con citas en conflicto, el paginador, la pantalla de error y la 404.
+- **De punta a punta** (Playwright, `npx playwright test`): un navegador real reserva en la página, abre el enlace del cliente y el equipo confirma la cita en el panel; también revisa los permisos de recepción, los reportes y la 404. Corre en computador y en celular contra la API real con PostgreSQL.
+- **En CI** corren el lint, las pruebas y la compilación en cada cambio; las de punta a punta levantan la API (rama `main` del backend) con los datos de la demo.
+
+Para las de punta a punta en local: enciende la API con los datos de la demo y corre `E2E_API_URL=http://localhost:3001 npx playwright test`.
+
 ## API
 
 Backend en [landing-panel-backend](https://github.com/robledocordoba123-cmyk/landing-panel-backend).

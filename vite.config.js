@@ -7,4 +7,10 @@ export default defineConfig(({ mode }) => ({
   server: {
     proxy: { '/api': loadEnv(mode, '.', '').VITE_API_URL || 'http://localhost:3001' },
   },
+  // Pruebas de componentes con Vitest, en un navegador simulado (jsdom).
+  test: {
+    environment: 'jsdom',
+    setupFiles: './src/pruebas/preparar.js',
+    include: ['src/**/*.test.{js,jsx}'],
+  },
 }))
