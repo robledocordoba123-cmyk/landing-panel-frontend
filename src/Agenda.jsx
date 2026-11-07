@@ -2,6 +2,8 @@ import { useEffect, useState } from 'react';
 import { CalendarDays, ChevronLeft, ChevronRight, Globe, Mail, MessageCircle, Phone } from 'lucide-react';
 import { api } from './api';
 import AtencionForm from './AtencionForm';
+import AgendaSemana from './AgendaSemana';
+import { lunesDe } from './horarios';
 import { Arco } from './Mascota';
 
 const ESTADOS = {
@@ -34,8 +36,10 @@ function Agenda({ usuario, alAbrirMascota, alCaducarSesion }) {
   const [ocupada, setOcupada] = useState(null);
   const [atendiendo, setAtendiendo] = useState(null);
   const [version, setVersion] = useState(0);
+  const [vista, setVista] = useState('dia');
 
   useEffect(() => {
+    if (vista !== 'dia') return undefined;
     let vigente = true;
     api(`/api/citas?desde=${fecha}`)
       .then((d) => {
@@ -51,7 +55,7 @@ function Agenda({ usuario, alAbrirMascota, alCaducarSesion }) {
     return () => {
       vigente = false;
     };
-  }, [fecha, version, alCaducarSesion]);
+  }, [fecha, version, vista, alCaducarSesion]);
 
   const cambiarEstado = async (id, estado) => {
     setOcupada(id);
@@ -71,24 +75,42 @@ function Agenda({ usuario, alAbrirMascota, alCaducarSesion }) {
   const citas = respuesta?.desde === fecha ? respuesta.citas : null;
   const activas = citas?.filter((c) => c.estado !== 'CANCELADA').length ?? 0;
   const ahora = new Date();
+  const paso = vista === 'semana' ? 7 : 1;
+  const lunes = lunesDe(fecha);
+  const titulo = vista === 'semana'
+    ? `Semana del ${new Date(`${lunes}T12:00:00Z`).toLocaleDateString('es-CO', { timeZone: 'UTC', day: 'numeric', month: 'long' })} al ${new Date(`${sumarDias(lunes, 6)}T12:00:00Z`).toLocaleDateString('es-CO', { timeZone: 'UTC', day: 'numeric', month: 'long' })}`
+    : `${fechaLarga(fecha)}${citas ? ` · ${activas} ${activas === 1 ? 'cita' : 'citas'}` : ''}`;
+  const abrirDia = (dia) => {
+    setFecha(dia);
+    setVista('dia');
+  };
 
   return (
     <section>
       <div className="flex flex-wrap items-center justify-between gap-3">
         <div>
           <h1 className="text-4xl font-extrabold text-pino-700">Agenda</h1>
-          <p className="text-tinta-600 first-letter:uppercase">{fechaLarga(fecha)}{citas && ` · ${activas} ${activas === 1 ? 'cita' : 'citas'}`}</p>
+          <p className="text-tinta-600 first-letter:uppercase">{titulo}</p>
         </div>
-        <div className="flex items-center gap-2">
-          <button type="button" onClick={() => setFecha(sumarDias(fecha, -1))} aria-label="Día anterior" className="grid h-10 w-10 place-items-center rounded-full bg-white text-tinta-600 hover:bg-crema-200"><ChevronLeft size={18} /></button>
+        <div className="flex flex-wrap items-center gap-2">
+          <div className="flex rounded-full bg-white p-1" role="group" aria-label="Vista">
+            {[['dia', 'Día'], ['semana', 'Semana']].map(([valor, texto]) => (
+              <button key={valor} type="button" onClick={() => setVista(valor)} aria-pressed={vista === valor}
+                className={`rounded-full px-3 py-1.5 text-sm font-semibold ${vista === valor ? 'bg-pino-600 text-white' : 'text-tinta-600 hover:bg-crema-100'}`}>{texto}</button>
+            ))}
+          </div>
+          <button type="button" onClick={() => setFecha(sumarDias(fecha, -paso))} aria-label={vista === 'semana' ? 'Semana anterior' : 'Día anterior'} className="grid h-10 w-10 place-items-center rounded-full bg-white text-tinta-600 hover:bg-crema-200"><ChevronLeft size={18} /></button>
           <button type="button" onClick={() => setFecha(fechaHoy())} className="rounded-full bg-white px-4 py-2 text-sm font-semibold text-tinta-600 hover:bg-crema-200">Hoy</button>
           <input type="date" value={fecha} onChange={(e) => e.target.value && setFecha(e.target.value)} aria-label="Elegir día" className="rounded-xl border border-tinta-200 bg-white px-3 py-2 text-sm text-tinta-700" />
-          <button type="button" onClick={() => setFecha(sumarDias(fecha, 1))} aria-label="Día siguiente" className="grid h-10 w-10 place-items-center rounded-full bg-white text-tinta-600 hover:bg-crema-200"><ChevronRight size={18} /></button>
+          <button type="button" onClick={() => setFecha(sumarDias(fecha, paso))} aria-label={vista === 'semana' ? 'Semana siguiente' : 'Día siguiente'} className="grid h-10 w-10 place-items-center rounded-full bg-white text-tinta-600 hover:bg-crema-200"><ChevronRight size={18} /></button>
         </div>
       </div>
 
-      {error && <p className="mt-4 text-red-600" role="alert">{error}</p>}
+      {vista === 'semana' && <AgendaSemana fecha={fecha} hoy={fechaHoy()} alElegirDia={abrirDia} alCaducarSesion={alCaducarSesion} />}
 
+      {vista === 'dia' && error && <p className="mt-4 text-red-600" role="alert">{error}</p>}
+
+      {vista === 'dia' && (
       <div className="mt-5 space-y-3">
         {!citas && !error && <p className="py-10 text-center text-tinta-400">Cargando…</p>}
         {citas?.length === 0 && (
@@ -142,6 +164,7 @@ function Agenda({ usuario, alAbrirMascota, alCaducarSesion }) {
           );
         })}
       </div>
+      )}
     </section>
   );
 }

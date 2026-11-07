@@ -16,6 +16,7 @@ export async function api(ruta, { metodo = 'GET', datos } = {}) {
   if (!respuesta.ok) {
     const error = new Error(cuerpo.error || 'Algo salió mal. Intenta de nuevo.');
     error.estado = respuesta.status;
+    error.cuerpo = cuerpo;
     throw error;
   }
   return cuerpo;
