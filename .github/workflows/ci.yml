@@ -11,7 +11,7 @@ jobs:
     name: Web (lint + pruebas + build)
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
       - uses: actions/setup-node@v4
         with:
           node-version: 22
@@ -42,8 +42,8 @@ jobs:
       DATABASE_URL: postgresql://huellitas:huellitas_dev@localhost:5432/huellitas?schema=public
       E2E_API_URL: http://localhost:3001
     steps:
-      - uses: actions/checkout@v4
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
+      - uses: actions/checkout@v7
         with:
           repository: robledocordoba123-cmyk/landing-panel-backend
           path: api
