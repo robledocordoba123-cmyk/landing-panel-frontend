@@ -1,5 +1,6 @@
 import { expect, test } from '@playwright/test';
 import AxeBuilder from '@axe-core/playwright';
+import { diaConHorarios } from './ayuda';
 
 // Revisión automática con axe (WCAG 2.1 A y AA) de cada página y sección del panel.
 // No reemplaza probar con lector de pantalla, pero atrapa contraste, nombres de
@@ -18,14 +19,17 @@ test('páginas públicas', async ({ page }) => {
   }
 });
 
-test('los pasos de la reserva', async ({ page }) => {
+test('los pasos de la reserva', async ({ page, request }) => {
+  const { fecha, hora } = await diaConHorarios(request);
   await page.goto('/#cita');
   const reserva = page.locator('#cita');
   await reserva.getByRole('button', { name: /Consulta general/ }).click();
-  await expect(reserva.getByText('¿Qué día?')).toBeVisible();
+  await reserva.getByLabel('¿Qué día?').fill(fecha);
+  await expect(reserva.getByRole('button', { name: hora, exact: true })).toBeVisible();
   await page.waitForLoadState('networkidle');
   await sinProblemas(page, 'paso de día y hora');
-  await reserva.locator('button', { hasText: /a\. m\.|p\. m\./ }).first().click();
+  await reserva.getByRole('button', { name: hora, exact: true }).click();
+  await expect(reserva.getByLabel('Tu nombre')).toBeVisible();
   await sinProblemas(page, 'paso de datos');
 });
 
